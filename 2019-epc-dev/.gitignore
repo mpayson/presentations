@@ -1,0 +1,4 @@
+node_modules/
+intelligence_temp/
+data/
+.DS_Store
