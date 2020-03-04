@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Custom (username / password)</title>
+
+    <script>
+      var dojoConfig = {
+        has: {
+          "esri-native-promise": true
+        }
+      };
+    </script>
+
+    <!-- Calcite Components -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.css">
+    <script type="module" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.js"></script>
+
+    <!-- Local components -->
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/styles/atelier-cave-light.min.css">
+
+    <!-- Local components -->
+    <link rel="stylesheet" type="text/css" href="/common.css">
+
+    <!-- JS API -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/next/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/next/"></script>
+
+  </head>
+
+  <body>
+    <div id="map-view">
+      <div id="panel">
+        <h3 class="muted-text">Custom Auth</h3>
+        <div>
+          <h3 class="h-margin-sm">User</h3>
+          <p id="un-display" class="inline-header">--</p>
+          <calcite-button id="logout" class="right" scale="xs" appearance="inline">Log out</calcite-button>
+        </div>
+        <div id="ags-user-container">
+          <h3 class="h-margin-sm">ArcGIS User</h3>
+        </div>
+        <hr/>
+        <h3>Maps you own</h3>
+        <div id="item-container" style="max-height: calc(100vh - 320px); overflow-y: scroll; overflow-x: hidden;">
+          <div style="padding: 5px; background: var(--calcite-ui-background);">
+            <h2 class="muted-text">Connect your ArcGIS account to view your maps</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="side-panel">
+      <h2 class="muted-text">Implementation highlights</h2>
+      <div class="js-code">
+      </div>
+    </div>
+    <div id="login-window">
+      <form id="login-form">
+        <h3>Log in</h3>
+        <p class="muted-text">Custom (username / password)</p>
+        <label>
+          Username
+          <input type="text" placeholder="Enter username" id="un" required autocomplete="on">
+        </label>
+        <label>
+          Password
+          <input type="password" placeholder="Enter passsword" id="pw" required autocomplete="on">
+        </label>
+        <calcite-button type="submit" class="right">Go!</calcite-button>
+      </form>
+    </div>
+
+    <calcite-alert color="red" id="alert">
+      <div id="title" slot="alert-title">--</div>
+      <div id="message" slot="alert-message">
+        --
+      </div>
+    </calcite-alert>
+    <script src="/common.js"></script>
+    <script>
+
+      const SESSION_ID = '__ESRI_CONNECT_AGS_PATTERN__';
+
+      let state = {
+        session: null,
+        ags: null
+      }
+
+      // relevant elements
+      const unEl = document.querySelector("#un");
+      const pwEl = document.querySelector("#pw");
+      const logInEl = document.querySelector("#login-window");
+      const unDisplayEl = document.querySelector("#un-display");
+      const agsEl = document.querySelector("#ags-user-container");
+      const itemsEl = document.querySelector("#item-container");
+
+      /****************************************************
+         * Custom authentication logic
+      ****************************************************/
+
+      // check if the user has already logged in
+      const prevSession = localStorage.getItem(SESSION_ID);
+      if(prevSession !== null && prevSession !== "undefined"){
+        state.session = JSON.parse(prevSession);
+        state.session.expires = new Date(state.session.expires);
+        if(state.session.expires <= new Date()){
+          state.session = null;
+          localStorage.removeItem(SESSION_ID);
+        } else {
+          onAuthenticated(state.session);
+        }
+      }
+
+      addToLog('Check for an existing session', `
+const prevSession = localStorage.getItem(SESSION_ID);
+if(prevSession !== null && prevSession !== "undefined"){
+  state.session = JSON.parse(prevSession);
+  state.session.expires = new Date(state.session.expires);
+  if(state.session.expires <= new Date()){
+    state.session = null;
+    localStorage.removeItem(SESSION_ID);
+  } else {
+    onAuthenticated(state.session);
+  }
+}
+console.log(state.session);
+/*${JSON.stringify(state.session, null, 2)}*/
+`)
+
+      // log the user in when they click log in
+      const form = document.querySelector("#login-form").onsubmit = async function(){    
+        let loginResult;
+        try {
+          loginResult = await post('/connect/authenticate', {
+            username: unEl.value, password: pwEl.value
+          }, null, 'Post username & password');
+        } catch(e) {
+          genericErrorHandler(e);
+          return;
+        }
+        localStorage.setItem(SESSION_ID, JSON.stringify(loginResult));
+        state.session = loginResult;
+        onAuthenticated(state.session);
+      }
+
+      // log the user out
+      document.querySelector('#logout').addEventListener('click', async function(){
+        onRemoveAGSCredential(state.session.token);
+        state = {session: null, ags: null};
+        localStorage.removeItem(SESSION_ID);
+        logInEl.style.display = 'block';
+      })
+
+      // update the app when the user logs in
+      async function onAuthenticated({token, user}){
+        unDisplayEl.textContent = user;
+        logInEl.style.display = 'none';
+        let agsResult;
+        try {
+          agsResult = await get('/connect/ags-credential', token, 'Get an ArcGIS token');
+        } catch(e){
+          genericErrorHandler(e);
+          return;
+        }
+        state.ags = agsResult.credential;
+        if(!agsResult || !agsResult.credential) {
+          onRemoveAGSCredential(token);
+          return;
+        };
+        onSetAGSCredential(agsResult.credential);
+      }
+
+      // update the UI when the ArcGIS credential is defined
+      function onSetAGSCredential(agsCredential){
+        clearAGSDisplay();
+        state.ags = agsCredential;
+        if(setupAGS) setupAGS(state.ags, itemsEl);
+        const agsDisplay = createElementWithAttrs('p', {'class': 'inline-header'});
+        agsDisplay.innerText = agsCredential.userId;
+        agsEl.appendChild(agsDisplay);
+        const disconnectBtn = createElementWithAttrs('calcite-button', {
+          'class': 'right',
+          'scale': 'xs',
+          'appearance': 'inline'
+        });
+        disconnectBtn.innerText = 'Disconnect';
+        disconnectBtn.onclick = onClickDisconnectAGS;
+        agsEl.appendChild(disconnectBtn);
+      }
+
+      // click handler for disconnecting ArcGIS
+      async function onClickDisconnectAGS(){
+        let res;
+        try {
+          res = await post('/connect/ags-disconnect', null, state.session.token, 'Remove associated ArcGIS account');
+        } catch(e){
+          genericErrorHandler(e);
+          return;
+        }
+        onRemoveAGSCredential(state.session.token);
+      }
+
+      // update the UI when the ArcGIS credential is removed
+      function onRemoveAGSCredential(){
+        clearAGSDisplay();
+        state.ags = null;
+        if(destroyAGS) destroyAGS(itemsEl);
+        const btn = createElementWithAttrs('calcite-button', {
+          'scale': 'xs',
+          'appearance': 'outline',
+          'width': 'full',
+          'href':  `/connect/ags-authorize?token=${state.session.token}`
+        });
+        btn.innerText = 'Connect';
+        agsEl.appendChild(btn);
+      }
+
+      // load ArcGIS / maps and get resulting interfaces
+      let setupAGS, destroyAGS, esriId;
+      (async function() {
+        ({setupAGS, destroyAGS, esriId} = await loadAGS());
+        if(esriId.credentials.length < 1 && state.ags) onSetAGSCredential(state.ags);
+      })();
+
+      // util function to reset UI
+      function clearAGSDisplay(){
+        const children = agsEl.children;
+        for(let i = children.length - 1; i > 0; i-- ){
+          agsEl.removeChild(children[i]);
+        }
+      }
+
+    </script>
+  </body>
+</html>

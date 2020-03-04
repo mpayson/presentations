@@ -1,0 +1,283 @@
+// Common JS functions, for these simple cases just run everything as globals
+
+
+/****************************************************
+   * UI Utils
+****************************************************/
+
+// set an alert in the dom
+function displayAlert(title, message, alertId="#alert"){
+  const alertEl = document.querySelector(alertId);
+  alertEl.querySelector("#title").textContent = title;
+  alertEl.querySelector("#message").textContent = message;
+  alertEl.active = true;
+}
+
+// DOM util for creating element with attributes
+function createElementWithAttrs(element, attributes){
+  const el = document.createElement(element);
+  Object.entries(attributes).forEach(([k,v]) => {
+    el.setAttribute(k, v);
+  });
+  return el;
+}
+
+// create a card UI for a given item
+function createCardForItem(item, onClick){
+  const container = createElementWithAttrs('div', {style: 'margin-bottom: 5px'});
+  const card = document.createElement('calcite-card');
+  const title = createElementWithAttrs('h3', {slot: "title"});
+  title.innerText = item.title;
+  const subtitle = createElementWithAttrs('span', {slot: "subtitle"});
+  subtitle.innerText = item.snippet;
+  const footer = createElementWithAttrs('span', {slot: "footer-leading"});
+  footer.innerText = `Modified: ${item.modified.toLocaleDateString()}`;
+  const addBtn = createElementWithAttrs('calcite-button', {
+    'scale': 'xs',
+    'slot': 'footer-trailing',
+    'icon': 'plus'
+  });
+  addBtn.onclick = _ => onClick(item.id);
+  
+  card.appendChild(title);
+  card.appendChild(subtitle);
+  card.appendChild(footer);
+  card.appendChild(addBtn);
+  container.appendChild(card);
+
+  return container;
+}
+
+function addToLog(title, codeText){
+  const panel = document.querySelector('#side-panel');
+  const header = createElementWithAttrs('div', {class: "h-margin-sm"});
+  const codeContainer = createElementWithAttrs('div', {class: 'js-code'});
+  const pre = document.createElement('pre');
+  const code = createElementWithAttrs('code', {class: 'javascript'});
+
+  header.innerText = title;
+  codeContainer.appendChild(pre);
+  pre.appendChild(code);
+  code.innerText = codeText;
+  panel.appendChild(header);
+  panel.appendChild(codeContainer);
+  document.querySelectorAll('pre code').forEach((block) => {
+    hljs.highlightBlock(block);
+  });
+}
+
+function appendRequestStep(title, url, addlParams, response){
+  const code = `const response = await fetch("${url}", ${JSON.stringify(addlParams, null, 2)});
+const data = await response.json();
+console.log(data);
+/*${JSON.stringify(response, null, 2)}*/
+`
+  addToLog(title, code);
+}
+
+
+/****************************************************
+   * Network utils
+****************************************************/
+
+// generic handler for unknown errors
+// in this simple use case just directly update the UI on error
+function genericErrorHandler(error, alertId="#alert"){
+  console.log(error);
+  const name = error.name ? error.name : 'Uh-oh';
+  const message = error.message ? error.message : 'Something went wrong, please retry';
+  displayAlert(name, message, alertId);
+}
+
+// Make a request and handle errors
+async function request(url, params, token, displayTitle){
+  const addlParams = params ? params : {};
+  if(addlParams.headers && token){
+    addlParams.headers['authorization'] = token;
+  } else if(token){
+    addlParams.headers = {authorization: token};
+  }
+  const response = await fetch(url, {...addlParams})
+  const data = await response.json();
+  if(displayTitle){
+    appendRequestStep(displayTitle, url, addlParams, data);
+  }
+  if(!response.ok){
+    const error = Error(data.message);
+    error.name = data.name;
+    error.status = data.status;
+    throw error;
+  }
+  return data;
+}
+
+// post data
+async function post(url, data, token=null, displayTitle=null){
+  const params = {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+  }
+  if(data) params.body = JSON.stringify(data);
+  return await request(url, params, token, displayTitle);
+}
+
+// get url
+async function get(url, token=null, displayTitle=null){
+  return await request(url, null, token, displayTitle);
+}
+
+/****************************************************
+   * Mapping functions
+****************************************************/
+
+// load the map / ArcGIS logic and return interfaces for interacting with it
+async function loadAGS(){
+  return new Promise((resolve, reject) => {
+    require([
+      "esri/Map",
+      "esri/WebMap",
+      "esri/views/MapView",
+      "esri/identity/IdentityManager",
+      "esri/portal/Portal",
+      "esri/portal/PortalQueryParams",
+      "esri/widgets/Legend",
+      "esri/widgets/Bookmarks",
+      "esri/widgets/Expand"
+    ], function(Map, WebMap, MapView, esriId, Portal, PortalQueryParams, Legend, Bookmarks, Expand) {
+      
+
+      /************************************
+         *  Build the UI
+      ************************************/
+      const map = new Map({
+        basemap: "satellite"
+      });
+      const view = new MapView({
+        container: "map-view",
+        map: map,
+        zoom: 4,
+        center: [15, 65]
+      });
+      view.ui.move("zoom", "bottom-right");
+      const bookmarks = new Bookmarks({
+        view,
+        editingEnabled: true
+      });
+      const bkExpand = new Expand({
+        view,
+        content: bookmarks,
+      });
+
+      view.ui.add(bkExpand, "bottom-right");
+
+      /************************************
+         *  Define ArcGIS interfaces
+      ************************************/
+
+      // load webmap when it's selected
+      async function onSelectMap(id){
+        const webmap = new WebMap({
+          portalItem: {id}
+        });
+        try{
+          view.map = webmap;
+          await webmap.when();
+        } catch(e){
+          genericErrorHandler(e);
+        }
+        view.viewpoint = webmap.initialViewProperties.viewpoint;
+
+        addToLog('Switch the map', `# ArcGIS JS API classes
+const webmap = new WebMap({
+  portalItem: {id}
+});
+try{
+  view.map = webmap;
+  await webmap.when();
+} catch(e){
+  genericErrorHandler(e);
+}
+view.viewpoint = webmap.initialViewProperties.viewpoint;
+        `)
+      }
+
+      // set up ArcGIS by registering the token and building
+      // the UI with available items
+      async function setupAGS(agsCredential, itemContainerEl){
+        const portal = new Portal({
+          url: agsCredential.server,
+          authMode: 'anonymous'
+        });
+        esriId.registerToken(agsCredential);
+        try{
+          await portal.load();
+        } catch(e){
+          genericErrorHandler(e);
+        }
+        const qParams = new PortalQueryParams({
+          query: `owner:"${agsCredential.userId}" AND type:"Web Map"`,
+          sortField: 'modified',
+          sortOrder: 'desc',
+          num: 20
+        });
+        let qRes;
+        try {
+          qRes = await portal.queryItems(qParams);
+        } catch(e){
+          genericErrorHandler(e);
+        }
+        itemContainerEl.innerHTML = null;
+        qRes.results.forEach(r => {
+          const el = createCardForItem(r, onSelectMap);
+          itemContainerEl.appendChild(el);
+        });
+
+
+        addToLog('Register a session and query portal for maps owned by user', `# ArcGIS JS API classes
+const portal = new Portal({
+  url: agsCredential.server,
+  authMode: 'anonymous'
+});
+esriId.registerToken(agsCredential);
+await portal.load();
+
+const qParams = new PortalQueryParams({
+  query: \`owner:"\${state.ags.userId}" AND type:"Web Map"\`,
+  sortField: 'modified',
+  sortOrder: 'desc',
+  num: 20
+});
+let qRes = await portal.queryItems(qParams);
+console.log(qRes.results.length);
+/*${qRes.results.length}*/
+        `)
+      }
+
+      // destroy ArcGIS by deleting the token and
+      // clearing the UI
+      function destroyAGS(itemContainerEl){
+
+        view.map = null;
+        view.map = map;
+
+        esriId.destroyCredentials();
+
+        itemContainerEl.innerHTML = null;
+        const container = createElementWithAttrs('div', {
+          style: "padding: 5px; background: var(--calcite-ui-background); text-align: center;"
+        });
+        itemContainerEl.appendChild(container);
+        const text = createElementWithAttrs('h2', {class: 'muted-text'});
+        text.innerText = "Connect an ArcGIS account to view items";
+        container.appendChild(text);
+      }
+
+      resolve({
+        setupAGS,
+        destroyAGS,
+        esriId
+      })
+
+    })
+  })
+}

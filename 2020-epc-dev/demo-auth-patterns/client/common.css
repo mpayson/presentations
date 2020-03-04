@@ -1,0 +1,119 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+}
+#map-view{
+  height: 100vh;
+  width: 70%;
+}
+#side-panel{
+  width: 30%;
+  overflow-y: scroll;
+  background: var(--calcite-ui-background);
+  z-index: 100;
+  padding: 0rem 1rem;
+  background: var(--calcite-ui-background);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 1);
+}
+/* Copied from the ArcGIS Online form */
+input, select, textarea {
+  position: relative;
+  display: block;
+  height: 2.25rem;
+  width: 100%;
+  max-width: 100%;
+  margin: .25rem 0 0 0;
+  padding: 0 0.3rem;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  color: #4c4c4c;
+  outline: none;
+  outline-offset: 0;
+  background-color: #ffffff;
+  border: 1px solid #a9a9a9;
+  border-radius: 0;
+  -webkit-transition: border-color 150ms linear;
+  transition: border-color 150ms linear;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+}
+
+label {
+  position: relative;
+  display: block;
+  margin: 0 0 1.5rem 0;
+}
+
+hr{
+  margin: 20px 0px 20px 0px;
+}
+
+#panel {
+  width: 250px;
+  max-height: calc(100vh - 70px);
+  padding: 0px 15px 15px 15px;
+
+  position: absolute;
+  top: 15px;
+  left: 15px;
+
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 16px 0px;
+  background-color: var(--calcite-ui-foreground);
+}
+
+/* take up the whole screen */
+#login-window{
+  width: 70%;
+  height: 100%;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  background: var(--calcite-ui-background);
+}
+
+#login-form{
+  width: 350px;
+  max-height: 350px;
+
+  position: absolute;
+  top: 10vh;
+  left: calc(50% - 190px);
+
+  padding: 0px 15px 15px 15px;
+  box-shadow: var(--calcite-ui-border-2) 0px 0px 16px 0px;
+  text-align: center;
+
+  background: var(--calcite-ui-foreground);
+}
+
+.muted-text {
+  color: var(--calcite-ui-text-3);
+  font-weight: lighter;
+}
+
+.right{
+  float: right;
+}
+
+.inline-header{
+  display: inline-block;
+  margin: 0px;
+}
+
+.h-margin-sm{
+  margin: 15px 0px 5px 0px;
+}
+
+

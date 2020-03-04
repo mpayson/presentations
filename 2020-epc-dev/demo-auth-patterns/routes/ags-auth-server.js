@@ -1,0 +1,73 @@
+/****************************************************
+   * SERVER BASED OAUTH 2.0
+   * This uses arcgis-rest-js for convenience, but can also use other libraries or REST, more:
+   * https://developers.arcgis.com/documentation/core-concepts/security-and-authentication/
+****************************************************/
+const express = require('express');
+const router = express.Router();
+
+const { isAuthorizedSession } = require("../middleware/is-authorized");
+const { UserSession } = require("@esri/arcgis-rest-auth");
+
+// get the required config variables
+require('dotenv').config();
+const { CLIENT_ID, REDIRECT_URI } = process.env;
+const TOKEN_EXPIRATION_MS = 2592000000;
+
+module.exports = function(userStore){
+
+  // not currently used, but could be used to interact with user store
+  // eg to validate that user should access the app before setting a session
+  // or to get additional information from the store about the user
+  const { getUserForAGSUser, joinAGSSession } = userStore;
+
+  // initiate user authorization, redirects user to ArcGIS to log in
+  router.get("/authorize", function(req, res) {
+  UserSession.authorize({
+    clientId: CLIENT_ID,
+    redirectUri: REDIRECT_URI
+  }, res);
+  });
+
+  // exchange code for the tokens, check if user exists, and store in session
+  router.get("/redirect", async function(req, res) {
+    const userSession = await UserSession.exchangeAuthorizationCode({
+      clientId: CLIENT_ID,
+      redirectUri: REDIRECT_URI
+    }, req.query.code);
+
+    // could add additional validation here or
+    // fetch user info from store to encode in the session
+
+    // store the session
+    req.session.user = userSession.username;
+    req.session.agsSession = userSession.serialize();
+    return res.redirect('/ags-auth-server.html');
+  });
+
+  // return user information, for now just the username
+  router.get("/self", isAuthorizedSession, function(req, res){
+    res.json({
+      user: req.user // middleware adds user to request
+    })
+  })
+
+  // forward ArcGIS session information to the browser & refresh if needed
+  // eg to register the credential with the JS API
+  router.get("/ags-credential", isAuthorizedSession, async function(req, res){
+    let userSession = UserSession.deserialize(req.session.agsSession);
+    userSession = await userSession.refreshSession();
+    req.session.agsSession = userSession.serialize();
+    return res.json(userSession.toCredential());
+  });
+
+  // log the user out of the service
+  router.post('/logout', isAuthorizedSession, function(req, res){
+    req.session.destroy(function(err){
+      res.cookie("extend-arcgis-demo", { maxAge: TOKEN_EXPIRATION_MS });
+      return res.json({"message": "success!"});
+    });
+  });
+
+  return router;
+}

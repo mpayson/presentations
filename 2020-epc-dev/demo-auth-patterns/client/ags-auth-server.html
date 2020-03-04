@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Custom (username / password)</title>
+
+    <script>
+      var dojoConfig = {
+        has: {
+          "esri-native-promise": true
+        }
+      };
+    </script>
+
+    <!-- Calcite Components -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.css">
+    <script type="module" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.js"></script>
+
+    <!-- Local components -->
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/styles/atelier-cave-light.min.css">
+
+    <!-- Local components -->
+    <link rel="stylesheet" type="text/css" href="/common.css">
+
+    <!-- JS API -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/next/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/next/"></script>
+
+  </head>
+
+  <body>
+    <div id="map-view">
+      <div id="panel">
+        <h3 class="muted-text">ArcGIS Auth - Server</h3>
+        <div>
+          <h3 class="h-margin-sm">User</h3>
+          <p id="un-display" class="inline-header">--</p>
+          <calcite-button id="logout" class="right" scale="xs" appearance="inline">Log out</calcite-button>
+        </div>
+        <hr/>
+        <h3>Maps you own</h3>
+        <div id="item-container" style="max-height: calc(100vh - 320px); overflow-y: scroll; overflow-x: hidden;">
+          <div style="padding: 5px; background: var(--calcite-ui-background);">
+            <h2 class="muted-text">Connect your ArcGIS account to view your maps</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="side-panel">
+      <h2 class="muted-text">Implementation highlights</h2>
+      <div class="js-code">
+      </div>
+    </div>
+    <div id="login-window">
+      <form id="login-form">
+        <h3>Log in</h3>
+        <calcite-button class="full" href="/ags-server/authorize">ArcGIS</calcite-button>
+      </form>
+    </div>
+
+    <calcite-alert color="red" id="alert">
+      <div id="title" slot="alert-title">--</div>
+      <div id="message" slot="alert-message">
+        --
+      </div>
+    </calcite-alert>
+    <script src="/common.js"></script>
+    <script>
+
+      const SESSION_ID = '__ESRI_AUTH_SERVER_PATTERN_';
+
+      let state = {
+        ags: null
+      }
+
+      // relevant elements
+      const logInEl = document.querySelector("#login-window");
+      const unDisplayEl = document.querySelector("#un-display");
+      const itemsEl = document.querySelector("#item-container");
+
+      /****************************************************
+         * Custom authentication logic
+      ****************************************************/
+
+      // get arcgis token and check if user is logged in since this is a protected route
+      // note, normally the check to see if the user is logged in would happen on the server
+      // and if the user isn't logged in, they'd be redirected when trying to access the '/ags-auth-server.html route'
+      // but I wanted to keep the demos to one html page
+      async function init(){
+        let agsCredential;
+        try{
+          agsCredential = await get('/ags-server/ags-credential', null, 'Get token / checked if logged in (normally done with redirect)', false);
+        } catch(e){
+          // 401 is expected if not logged in, so don't take action
+          if(e.status !== 401) genericErrorHandler(e);
+          return;
+        }
+
+        // now we know the user is authenticated, so let's get user info
+        let username;
+        try{
+          let res = await get('/ags-server/self', null, 'Get information about the user');
+          username = res.user;
+        } catch(e){
+          genericErrorHandler(e);
+          return;
+        }
+
+        unDisplayEl.textContent = username;
+        logInEl.style.display = 'none';
+        state.ags = agsCredential;
+        if(setupAGS) setupAGS(state.ags, itemsEl);
+      }
+      init();
+
+      // log the user out
+      document.querySelector('#logout').addEventListener('click', async function(){
+        unDisplayEl.textContent = '--';
+        logInEl.style.display = 'block';
+        post('/ags-server/logout', null, null, 'Log the user out');
+      })
+
+      // load ArcGIS / maps and get resulting interfaces
+      let setupAGS, destroyAGS, esriId;
+      (async function() {
+        ({setupAGS, destroyAGS, esriId} = await loadAGS());
+        if(esriId.credentials.length < 1 && state.ags) setupAGS(state.ags, itemsEl);
+      })();
+
+
+
+    </script>
+  </body>
+</html>
+ 
