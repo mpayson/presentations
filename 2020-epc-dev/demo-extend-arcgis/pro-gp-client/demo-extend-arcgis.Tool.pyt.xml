@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<metadata xml:lang="en">
+	<Esri>
+		<CreaDate>20200225</CreaDate>
+		<CreaTime>04404400</CreaTime>
+		<ArcGISFormat>1.0</ArcGISFormat>
+		<SyncOnce>TRUE</SyncOnce>
+		<ModDate>20200225</ModDate>
+		<ModTime>5275900</ModTime>
+		<scaleRange>
+			<minScale>150000000</minScale>
+			<maxScale>5000</maxScale>
+		</scaleRange>
+	</Esri>
+	<tool name="Tool" displayname="Extend ArcGIS GP Tool" toolboxalias="demo-extend-arcgis" xmlns="">
+		<arcToolboxHelpPath>c:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+		<parameters>
+			<param name="aoi_lyr" displayname="Points or Areas of Interest" type="Required" direction="Input" datatype="Feature Set" expression="aoi_lyr">
+				<dialogReference>&lt;DIV STYLE="text-align:Left;"&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN&gt;Points or areas of interest to fetch risk information from the API.&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</dialogReference>
+				<pythonReference>&lt;DIV STYLE="text-align:Left;"&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN&gt;FeatureRecordSet representing points or areas of interest to fetch risk information from the API&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</pythonReference>
+			</param>
+		</parameters>
+		<summary>A quick tool to demo extending ArcGIS via a GP tool. The tool calls an external API to get risk information about selected locations.</summary>
+		<usage>The ArcGIS user to have access to the API on the backend. This is validated against the active Portal session information. Since it's just an API call, this could also include rate limiting or billing against the user account.</usage>
+	</tool>
+	<dataIdInfo>
+		<idCitation>
+			<resTitle>Extend ArcGIS GP Tool</resTitle>
+		</idCitation>
+		<searchKeys>
+			<keyword>demo</keyword>
+			<keyword>extend-arcgis</keyword>
+			<keyword>poc</keyword>
+		</searchKeys>
+	</dataIdInfo>
+	<distInfo>
+		<distributor>
+			<distorFormat>
+				<formatName>ArcToolbox Tool</formatName>
+			</distorFormat>
+		</distributor>
+	</distInfo>
+	<mdHrLv>
+		<ScopeCd value="005"/>
+	</mdHrLv>
+	<mdDateSt Sync="TRUE">20200225</mdDateSt>
+</metadata>

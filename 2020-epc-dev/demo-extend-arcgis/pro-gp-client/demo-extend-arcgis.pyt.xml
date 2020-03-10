@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en">
+    <Esri>
+        <CreaDate>20200225</CreaDate>
+        <CreaTime>04403700</CreaTime>
+        <ArcGISFormat>1.0</ArcGISFormat>
+        <SyncOnce>TRUE</SyncOnce>
+        <ModDate>20200310</ModDate>
+        <ModTime>093713</ModTime>
+    </Esri>
+    <toolbox name="demo-extend-arcgis" alias="Extend ArcGIS Demo">
+        <arcToolboxHelpPath>c:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+        <toolsets/>
+    </toolbox>
+    <dataIdInfo>
+        <idCitation>
+            <resTitle>demo-extend-arcgis</resTitle>
+        </idCitation>
+    </dataIdInfo>
+    <distInfo>
+        <distributor>
+            <distorFormat>
+                <formatName>ArcToolbox Toolbox</formatName>
+            </distorFormat>
+        </distributor>
+    </distInfo>
+</metadata>

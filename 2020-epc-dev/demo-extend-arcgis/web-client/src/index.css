@@ -1,0 +1,37 @@
+html,
+body,
+#root {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Avenir Next W01","Avenir Next W00","Avenir Next","Avenir","Helvetica Neue",sans-serif;
+  font-feature-settings: "liga" 1,"calt" 0;
+  color: #1D2224;
+  overflow: hidden;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-top-margin {
+  margin: 0px 0px 16px 0px;
+}
+
+.no-margin {
+  margin: 0px;
+}
+
+.no-bottom-margin {
+  margin: 16px 0px 0px 0px;
+}
