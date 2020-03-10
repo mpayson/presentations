@@ -3,6 +3,10 @@ require("isomorphic-form-data");
 const fetch = require("node-fetch");
 const { setDefaultRequestOptions } = require("@esri/arcgis-rest-request");
 setDefaultRequestOptions({ fetch });
+// env variables
+const isDev = process.env.NODE_ENV || 'dev'; // assume dev if NODE_ENV not set
+if(isDev) require('dotenv').config(); // load dev variables, otherwise they'll be available
+
 // express imports
 const path = require("path");
 const express = require ("express");
@@ -15,7 +19,7 @@ const app = express();
 const FileStore = SessionFileStore(session);
 
 // load and setup config variables from .env file
-require('dotenv').config();
+
 const { PORT, ENCRYPTION_KEY, SESSION_SECRET } = process.env;
 
 // setup sessions, express will set a cookie on the client

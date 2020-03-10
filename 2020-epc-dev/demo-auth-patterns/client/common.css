@@ -17,7 +17,6 @@ body {
   background: var(--calcite-ui-background);
   z-index: 100;
   padding: 0rem 1rem;
-  background: var(--calcite-ui-background);
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 1);
 }
 /* Copied from the ArcGIS Online form */

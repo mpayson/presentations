@@ -11,7 +11,6 @@ const { UserSession } = require("@esri/arcgis-rest-auth");
 const { authorizeWithState, getJWTForRequest } = require("../utils/utils")
 
 // load and setup config variables from .env file
-require('dotenv').config();
 const { CLIENT_ID, CONNECT_REDIRECT_URI, SESSION_SECRET } = process.env;
 const TOKEN_EXPIRATION_MINUTES = 60;
 
