@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Custom (username / password)</title>
+    <title>Use ArcGIS - Client</title>
 
     <script>
       var dojoConfig = {
@@ -42,17 +42,19 @@
   <body>
     <div id="map-view">
       <div id="panel">
-        <h3 class="muted-text">ArcGIS Auth - Server</h3>
+        <h3 class="muted-text">Use ArcGIS - Client</h3>
         <div>
           <h3 class="h-margin-sm">User</h3>
           <p id="un-display" class="inline-header">--</p>
           <calcite-button id="logout" class="right" scale="xs" appearance="inline">Log out</calcite-button>
         </div>
         <hr/>
+        <calcite-button id="get-user">Get user info</calcite-button>
+        <calcite-button id="load-maps">Load maps</calcite-button>
         <h3>Maps you own</h3>
         <div id="item-container" style="max-height: calc(100vh - 320px); overflow-y: scroll; overflow-x: hidden;">
           <div style="padding: 5px; background: var(--calcite-ui-background);">
-            <h2 class="muted-text">Connect your ArcGIS account to view your maps</h2>
+            <h2 class="muted-text">Click above to load maps</h2>
           </div>
         </div>
       </div>
@@ -78,11 +80,10 @@
     <script src="/common.js"></script>
     <script>
 
-      const SESSION_ID = '__ESRI_AUTH_SERVER_PATTERN_';
+      const SESSION_ID = '__ESRI_USE_AGS_CLIENT_PATTERN__';
       const CLIENT_ID = '5tHxc2kU49jmSnHm';
 
       let state = {
-        session: null,
         ags: null
       }
 
@@ -98,10 +99,10 @@
       // check if the user has already logged in
       const serializedSession = localStorage.getItem(SESSION_ID);
       if(serializedSession !== null && serializedSession !== "undefined"){
-        let {session, ags} = JSON.parse(serializedSession);
-        session.expires = new Date(session.expires);
-        if(session.expires > new Date()){
-          state = {session, ags};
+        let parsed = JSON.parse(serializedSession);
+        parsed.expires = new Date(parsed.expires);
+        if(parsed.expires > new Date()){
+          state = {ags: parsed};
           onAuthenticated();
         } else {
           localStorage.removeItem(SESSION_ID);
@@ -111,16 +112,16 @@
       addToLog('Check for an existing session', `
 const serializedSession = localStorage.getItem(SESSION_ID);
 if(serializedSession !== null && serializedSession !== "undefined"){
-  let {session, ags} = JSON.parse(serializedSession);
-  session.expires = new Date(session.expires);
-  if(session.expires > new Date()){
-    state = {session, ags};
+  let parsed = JSON.parse(serializedSession);
+  parsed.expires = new Date(parsed.expires);
+  if(parsed.expires > new Date()){
+    state = {ags: parsed};
     onAuthenticated();
   } else {
     localStorage.removeItem(SESSION_ID);
   }
 }
-console.log(state.session);
+console.log(state);
 /*${JSON.stringify(state, null, 2)}*/
 `)
 
@@ -130,52 +131,45 @@ console.log(state.session);
       // get client id from url hash
       const match = window.location.href.match(/&state=([^&]+)/);
       if(match){
-        session = arcgisRest.UserSession.completeOAuth2({
-          clientId: CLIENT_ID
+        arcgisRest.UserSession.completeOAuth2({
+          clientId: CLIENT_ID,
+          popup: true
         });
       }
 
       // handle on login click, redirect here since handle login per above
+      // use a popup so can track what is happening
       document.querySelector("#login").onclick = async function(){
-        const agsRestSession = await arcgisRest.UserSession.beginOAuth2({
+        addToLog('Start browser-based OAuth process', `
+const session = await arcgisRest.UserSession.beginOAuth2({
+  clientId: CLIENT_ID,
+  redirectUri: '${window.location.href}',
+  popup: true
+});
+`)
+        const session = await arcgisRest.UserSession.beginOAuth2({
           clientId: CLIENT_ID,
-          popup: true,
-          redirectUri: `${window.location.href}`
+          redirectUri: `${window.location.href}`,
+          popup: true
         });
-        // other demos just work with the credential representation for the JS API
-        const agsCredential = agsRestSession.toCredential();
+        const credential = session.toCredential();
+        localStorage.setItem(SESSION_ID, JSON.stringify(credential));
+        state = {ags: credential};
 
-        // exchange ArcGIS token for backend server token
-        let session;
-        try{
-          session = await post('/ags-client/authenticate', agsCredential, null, 'Authenticate with the API');
-        } catch(e){
-          genericErrorHandler(e);
-          return;
-        }
-        localStorage.setItem(SESSION_ID, JSON.stringify({
-          session,
-          ags: agsCredential
-        }));
-        state = {
-          session,
-          ags: agsCredential
-        }
+        addToLog('Completed OAuth process', `
+const credential = session.toCredential();
+localStorage.setItem(SESSION_ID, JSON.stringify(credential));
+state = {ags: credential};
+console.log(state);
+/*${JSON.stringify(state, null, 2)}*/
+`)
         onAuthenticated();
       }
 
       async function onAuthenticated(){
-        let username;
-        try{
-          let res = await get('/ags-client/self', state.session.token, 'Get information about the user');
-          username = res.user;
-        } catch(e){
-          genericErrorHandler(e);
-          return;
-        }
+        const username = state.ags.userId;
         unDisplayEl.textContent = username;
         logInEl.style.display = 'none';
-        if(setupAGS) setupAGS(state.ags, itemsEl);
       }
 
       // log the user out
@@ -196,8 +190,24 @@ console.log(state);
       let setupAGS, destroyAGS, esriId;
       (async function() {
         ({setupAGS, destroyAGS, esriId} = await loadAGS());
-        if(esriId.credentials.length < 1 && state.ags) setupAGS(state.ags, itemsEl);
       })();
+
+      document.querySelector("#load-maps").addEventListener('click', function(){
+        if(setupAGS) setupAGS(state.ags, itemsEl);
+      });
+
+      document.querySelector("#get-user").addEventListener('click', async function(){
+        const userSession = new arcgisRest.UserSession.fromCredential(state.ags);
+        const userInfo = await userSession.getUser();
+        // let's delete groups for now
+        userInfo['groups'] = '[...]';
+        addToLog('Get user info!', `
+const userSession = new arcgisRest.UserSession.fromCredential(state.ags);
+const userInfo = await UserSession.getUser();
+console.log(userInfo);
+/*${JSON.stringify(userInfo, null, 2)}*/
+`)
+      });
 
     </script>
   </body>

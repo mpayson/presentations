@@ -142,8 +142,9 @@ async function loadAGS(){
       "esri/portal/PortalQueryParams",
       "esri/widgets/Legend",
       "esri/widgets/Bookmarks",
-      "esri/widgets/Expand"
-    ], function(Map, WebMap, MapView, esriId, Portal, PortalQueryParams, Legend, Bookmarks, Expand) {
+      "esri/widgets/Expand",
+      "esri/widgets/Legend"
+    ], function(Map, WebMap, MapView, esriId, Portal, PortalQueryParams, Legend, Bookmarks, Expand, Legend) {
       
 
       /************************************
@@ -167,8 +168,13 @@ async function loadAGS(){
         view,
         content: bookmarks,
       });
-
       view.ui.add(bkExpand, "bottom-right");
+      const legend = new Legend({view});
+      const lgExpand = new Expand({
+        view,
+        content: legend
+      })
+      view.ui.add(lgExpand, 'top-right');
 
       /************************************
          *  Define ArcGIS interfaces

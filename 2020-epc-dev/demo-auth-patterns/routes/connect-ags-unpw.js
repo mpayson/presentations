@@ -84,14 +84,12 @@ module.exports = function (userStore){
   // eg to register the credential with the JS API
   router.get("/ags-credential", isAuthorizedJWT, async function(req, res){
     const username = req.user;
-    let userSession = getAGSSessionForUser(username);
+    let userSession = await getAGSSessionForUser(username);
     if(!userSession){
       return res.json({
         credential: null
       });
     }
-    userSession = await userSession.refreshSession();
-    joinAGSSession(username, userSession);
     return res.json({credential: userSession.toCredential()});
   });
 

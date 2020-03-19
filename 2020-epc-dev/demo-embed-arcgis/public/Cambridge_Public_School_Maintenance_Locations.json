@@ -1,0 +1,317 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "EPSG:4326"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": 1,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1118865175999,
+          42.3743977275023
+        ]
+      },
+      "properties": {
+        "site_name": "Cambridge Rindge and Latin",
+        "address": "459 Broadway",
+        "phone": "617-349-6630",
+        "ObjectId": 1,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 2,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0978837553503,
+          42.3692953440808
+        ]
+      },
+      "properties": {
+        "site_name": "Cambridgeport School",
+        "address": "89 Elm St",
+        "phone": "617-349-6587",
+        "ObjectId": 2,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0958858198455,
+          42.3667896108724
+        ]
+      },
+      "properties": {
+        "site_name": "Fletcher / Maynard Academy",
+        "address": "225 Windsor St",
+        "phone": "617-349-6588",
+        "ObjectId": 3,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 4,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1236891811213,
+          42.3826765854627
+        ]
+      },
+      "properties": {
+        "site_name": "Graham & Parks School",
+        "address": "44 Linnaean St",
+        "phone": "617-349-6577",
+        "ObjectId": 4,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 5,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1525927679803,
+          42.3780388682148
+        ]
+      },
+      "properties": {
+        "site_name": "Haggerty School",
+        "address": "110 Cushing St",
+        "phone": "617-349-6555",
+        "ObjectId": 5,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 6,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0866153378273,
+          42.3694157355842
+        ]
+      },
+      "properties": {
+        "site_name": "Kennedy / Longfellow School",
+        "address": "158 Spring St",
+        "phone": "617-349-6841",
+        "ObjectId": 6,
+        "maintpriority": "low"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 7,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0917014996109,
+          42.3719642167368
+        ]
+      },
+      "properties": {
+        "site_name": "King Open School",
+        "address": "850 Cambridge St",
+        "phone": "617-349-6540",
+        "ObjectId": 7,
+        "maintpriority": "low"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 8,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1129989689504,
+          42.3668894047047
+        ]
+      },
+      "properties": {
+        "site_name": "Martin Luther King, Jr School",
+        "address": "100 Putnam Ave",
+        "phone": "617-349-6569",
+        "ObjectId": 8,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 9,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1127194496715,
+          42.3559067339581
+        ]
+      },
+      "properties": {
+        "site_name": "Morse School",
+        "address": "40 Granite St",
+        "phone": "617-349-6575",
+        "ObjectId": 9,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 10,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1283687295217,
+          42.3923110524099
+        ]
+      },
+      "properties": {
+        "site_name": "Peabody School",
+        "address": "70 Rindge Ave",
+        "phone": "617-349-6530",
+        "ObjectId": 10,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 11,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1119550379227,
+          42.3733754620302
+        ]
+      },
+      "properties": {
+        "site_name": "Rindge and Latin Auto Shop",
+        "address": "456 Broadway",
+        "phone": null,
+        "ObjectId": 11,
+        "maintpriority": "low"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 12,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1120159307569,
+          42.3744468164684
+        ]
+      },
+      "properties": {
+        "site_name": "Rindge School of Technical Arts",
+        "address": "459 Broadway",
+        "phone": "617-349-6890",
+        "ObjectId": 12,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 13,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1082831731547,
+          42.363007142976
+        ]
+      },
+      "properties": {
+        "site_name": "High School Extension Program",
+        "address": "15 Upton St",
+        "phone": "617-349-6880",
+        "ObjectId": 13,
+        "maintpriority": "low"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 14,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1398358027639,
+          42.3844186358368
+        ]
+      },
+      "properties": {
+        "site_name": "Tobin School",
+        "address": "197 Vassal Ln",
+        "phone": "617-349-6600",
+        "ObjectId": 14,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 15,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1166967387872,
+          42.3823412612664
+        ]
+      },
+      "properties": {
+        "site_name": "Baldwin School",
+        "address": "28 Sacramento St",
+        "phone": "617-349-6525",
+        "ObjectId": 15,
+        "maintpriority": "none"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 16,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1039937703308,
+          42.3710746400499
+        ]
+      },
+      "properties": {
+        "site_name": "CRLS 9th Grade Campus",
+        "address": "359 Broadway",
+        "phone": null,
+        "ObjectId": 16,
+        "maintpriority": "medium"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 17,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.1126029858108,
+          42.3673508852361
+        ]
+      },
+      "properties": {
+        "site_name": "Amigos School",
+        "address": "101 Kinnard St",
+        "phone": "617-349-6567",
+        "ObjectId": 17,
+        "maintpriority": "none"
+      }
+    }
+  ]
+}

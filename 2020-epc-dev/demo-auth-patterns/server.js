@@ -46,11 +46,11 @@ app.use(
 
 // set up different authorization options
 const memoryUserStore = require('./models/memory-userstore');
-const agsServerRouter = require('./routes/ags-auth-server');
-const agsClientRouter = require('./routes/ags-auth-client');
+const trustAgsServerRouter = require('./routes/trust-ags-server');
+const trustAgsClientRouter = require('./routes/trust-ags-client');
 const connectRouter = require('./routes/connect-ags-unpw');
-app.use('/ags-server', agsServerRouter(memoryUserStore));
-app.use('/ags-client', agsClientRouter(memoryUserStore));
+app.use('/trust-ags-server', trustAgsServerRouter(memoryUserStore));
+app.use('/trust-ags-client', trustAgsClientRouter(memoryUserStore));
 app.use('/connect', connectRouter(memoryUserStore));
 
 // web-client is outside the server directory so it's easier to compare

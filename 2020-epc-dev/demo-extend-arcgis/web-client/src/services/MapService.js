@@ -4,7 +4,6 @@ import {loadModules} from 'esri-loader';
 import options from '../config/esri-loader-options';
 import { UserSession } from '@esri/arcgis-rest-auth';
 import { SearchQueryBuilder, searchItems } from '@esri/arcgis-rest-portal';
-import { feature } from 'caniuse-lite';
 
 let _pModules;
 

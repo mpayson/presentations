@@ -113,11 +113,6 @@ class APIForm extends PureComponent{
       const lyr = this.props.view.map.layers.find(l => l.id === this.state.selectedLayer);
       oidField = lyr.objectIdField;
     }
-    // need to re-project back to webmercator for the map
-    // results.features.forEach(f => {
-    //   f.geometry = geographicToWebMercator(f.geometry);
-    // });
-    // results.spatialReference = { wkid: 102100 };
 
     this.resultLayer = layerFromFeatureSet(results, oidField, {
       title: ResultConfig.title,

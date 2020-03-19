@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Extend ArcGIS Demo - Web</title>
+    <title>ArcGIS Auth Patterns</title>
 
     <!-- Calcite Components -->
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.css">
@@ -19,8 +19,8 @@
       }
 
       #container {
-        width: 1000px;
-        height: 400px;
+        width: 980px;
+        height: 650px;
 
         position: absolute;
         top: 0;
@@ -28,8 +28,8 @@
         bottom:0;
         left: 0;
         margin: auto;
+        padding: 10px;
 
-        text-align: center;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 16px 0px;
         background-color: #f8f8f8;
       }
@@ -38,9 +38,8 @@
         width: 100%;
         display: flex;
         flex-direction: row; 
-        justify-content: center;
+        justify-content: left;
         text-align: left;
-        margin-top: 50px;
       }
 
       #grid > .grid-item {
@@ -54,18 +53,34 @@
 
   <body>
     <div id="container">
-      <h2>Authentication Pattern Demos</h2>
+      <div style="width: 100%; text-align: center">
+        <h1>Authentication Pattern Demos</h1>
+      </div>
+      <h3>App-tier / App login</h3>
       <div id="grid">
         <calcite-card class="grid-item">
-          <h3 slot="title">Connect to ArcGIS User</h3>
-          <span slot="subtitle">Allow users to connect ArcGIS accounts to existing partner accounts (in this case, a simple username / password system)</span>
+          <h3 slot="title">App-tier Service Proxy</h3>
+          <span slot="subtitle">Use a service proxy hosted by ArcGIS Online to access location services for all users</span>
+          <calcite-button slot="footer-leading" width="full" href="/ags-auth-proxy.html">Explore</calcite-button>
+        </calcite-card>
+      </div>
+      <h3>User-tier / User login</h3>
+      <div id="grid">
+        <calcite-card class="grid-item">
+          <h3 slot="title">Use ArcGIS</h3>
+          <span slot="subtitle">Just use ArcGIS to receive authorization to ArcGIS services, shows querying resources on behalf of user (note Marketplace can also validate user access)</span>
+          <calcite-button slot="footer-leading" width="full" href="/use-ags-client.html">Explore</calcite-button>
+        </calcite-card>
+        <calcite-card class="grid-item">
+          <h3 slot="title">Connect ArcGIS</h3>
+          <span slot="subtitle">Allow users to connect ArcGIS accounts to accounts in a custom identity store (in this case, a simple username / password system)</span>
           <calcite-button slot="footer-leading" width="full" href="/connect-ags-unpw.html">Explore</calcite-button>
         </calcite-card>
         <calcite-card class="grid-item">
-          <h3 slot="title">Authorize with ArcGIS User</h3>
-          <span slot="subtitle">Allow users to log in with an ArcGIS account to authorize access to a partner system</span>
-          <calcite-button slot="footer-leading" href="/ags-auth-server.html">Server-based</calcite-button>
-          <calcite-button slot="footer-trailing" href="/ags-auth-client.html">Browser-based</calcite-button>
+          <h3 slot="title">Trust ArcGIS</h3>
+          <span slot="subtitle">Allow users to log in with ArcGIS then use the resulting tokens to validate users in a custom identity store (in this case, a simple memory store)</span>
+          <calcite-button slot="footer-leading" href="/trust-ags-server.html">Server-based</calcite-button>
+          <calcite-button slot="footer-trailing" href="/trust-ags-client.html">Browser-based</calcite-button>
         </calcite-card>
       </div>
     </div>

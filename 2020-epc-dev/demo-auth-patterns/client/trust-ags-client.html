@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Trust ArcGIS - Client</title>
+
+    <script>
+      var dojoConfig = {
+        has: {
+          "esri-native-promise": true
+        }
+      };
+    </script>
+
+    <!-- Calcite Components -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.css">
+    <script type="module" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.20/dist/calcite/calcite.js"></script>
+
+    <!-- Local components -->
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.5/build/styles/atelier-cave-light.min.css">
+
+    <!-- Local components -->
+    <link rel="stylesheet" type="text/css" href="/common.css">
+
+    <!-- JS API and arcgis-rest-js -->
+    <script src="https://unpkg.com/@esri/arcgis-rest-request@2.9.0/dist/umd/request.umd.min.js"></script>
+    <script src="https://unpkg.com/@esri/arcgis-rest-auth@2.9.0/dist/umd/auth.umd.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/next/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/next/"></script>
+
+  </head>
+
+  <body>
+    <div id="map-view">
+      <div id="panel">
+        <h3 class="muted-text">Trust ArcGIS - Client</h3>
+        <div>
+          <h3 class="h-margin-sm">User</h3>
+          <p id="un-display" class="inline-header">--</p>
+          <calcite-button id="logout" class="right" scale="xs" appearance="inline">Log out</calcite-button>
+        </div>
+        <hr/>
+        <h3>Maps you own</h3>
+        <div id="item-container" style="max-height: calc(100vh - 320px); overflow-y: scroll; overflow-x: hidden;">
+          <div style="padding: 5px; background: var(--calcite-ui-background);">
+            <h2 class="muted-text">Connect your ArcGIS account to view your maps</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="side-panel">
+      <h2 class="muted-text">Implementation highlights</h2>
+      <div class="js-code">
+      </div>
+    </div>
+    <div id="login-window">
+      <div id="login-form">
+        <h3>Log in</h3>
+        <calcite-button class="full" id="login">ArcGIS</calcite-button>
+      </div>
+    </div>
+
+    <calcite-alert color="red" id="alert">
+      <div id="title" slot="alert-title">--</div>
+      <div id="message" slot="alert-message">
+        --
+      </div>
+    </calcite-alert>
+    <script src="/common.js"></script>
+    <script>
+
+      const SESSION_ID = '__ESRI_TRUST_AGS_CLIENT_PATTERN__';
+      const CLIENT_ID = '5tHxc2kU49jmSnHm';
+
+      let state = {
+        session: null,
+        ags: null
+      }
+
+      // relevant elements
+      const logInEl = document.querySelector("#login-window");
+      const unDisplayEl = document.querySelector("#un-display");
+      const itemsEl = document.querySelector("#item-container");
+
+      /****************************************************
+         * Custom authentication logic
+      ****************************************************/
+
+      // check if the user has already logged in
+      const serializedSession = localStorage.getItem(SESSION_ID);
+      if(serializedSession !== null && serializedSession !== "undefined"){
+        let {session, ags} = JSON.parse(serializedSession);
+        session.expires = new Date(session.expires);
+        if(session.expires > new Date()){
+          state = {session, ags};
+          onAuthenticated();
+        } else {
+          localStorage.removeItem(SESSION_ID);
+        }
+      }
+
+      addToLog('Check for an existing session', `
+const serializedSession = localStorage.getItem(SESSION_ID);
+if(serializedSession !== null && serializedSession !== "undefined"){
+  let {session, ags} = JSON.parse(serializedSession);
+  session.expires = new Date(session.expires);
+  if(session.expires > new Date()){
+    state = {session, ags};
+    onAuthenticated();
+  } else {
+    localStorage.removeItem(SESSION_ID);
+  }
+}
+console.log(state.session);
+/*${JSON.stringify(state, null, 2)}*/
+`)
+
+      // handle oauth callback if there's a state parameter in the URL
+      // note this is normally a standalone script on another HTML page
+      // but I wanted to keep the demos to one HTML page
+      // get client id from url hash
+      const match = window.location.href.match(/&state=([^&]+)/);
+      if(match){
+        arcgisRest.UserSession.completeOAuth2({
+          clientId: CLIENT_ID
+        });
+      }
+
+      // handle on login click, redirect here since handle login per above
+      document.querySelector("#login").onclick = async function(){
+        const agsRestSession = await arcgisRest.UserSession.beginOAuth2({
+          clientId: CLIENT_ID,
+          popup: true,
+          redirectUri: `${window.location.href}`
+        });
+        // other demos just work with the credential representation for the JS API
+        const agsCredential = agsRestSession.toCredential();
+
+        // exchange ArcGIS token for backend server token
+        let session;
+        try{
+          session = await post('/trust-ags-client/authenticate', agsCredential, null, 'Authenticate with the API');
+        } catch(e){
+          genericErrorHandler(e);
+          return;
+        }
+        localStorage.setItem(SESSION_ID, JSON.stringify({
+          session,
+          ags: agsCredential
+        }));
+        state = {
+          session,
+          ags: agsCredential
+        }
+        onAuthenticated();
+      }
+
+      async function onAuthenticated(){
+        let username;
+        try{
+          let res = await get('/trust-ags-client/self', state.session.token, 'Get information about the user');
+          username = res.user;
+        } catch(e){
+          genericErrorHandler(e);
+          return;
+        }
+        unDisplayEl.textContent = username;
+        logInEl.style.display = 'none';
+        if(setupAGS) setupAGS(state.ags, itemsEl);
+      }
+
+      // log the user out
+      document.querySelector('#logout').addEventListener('click', async function(){
+        unDisplayEl.textContent = '--';
+        logInEl.style.display = 'block';
+        localStorage.removeItem(SESSION_ID);
+        state = {};
+        addToLog('Log the user out', `
+localStorage.removeItem(SESSION_ID);
+state = {};
+console.log(state);
+/*${JSON.stringify(state, null, 2)}*/
+`)
+      });
+
+      // load ArcGIS / maps and get resulting interfaces
+      let setupAGS, destroyAGS, esriId;
+      (async function() {
+        ({setupAGS, destroyAGS, esriId} = await loadAGS());
+        if(esriId.credentials.length < 1 && state.ags) setupAGS(state.ags, itemsEl);
+      })();
+
+    </script>
+  </body>
+</html>
+ 

@@ -1,0 +1,43 @@
+{
+  "name": "embed-arcgis-demo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@esri/arcgis-rest-auth": "^2.0.0",
+    "@esri/arcgis-rest-feature-layer": "^2.9.0",
+    "@esri/arcgis-rest-portal": "^2.9.0",
+    "@esri/arcgis-rest-request": "^2.0.0",
+    "calcite-react": "^0.48.0",
+    "calcite-ui-icons-react": "^0.11.0",
+    "esri-loader": "^2.10.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "postinstall": "npm run copy:auth",
+    "prebuild": "npm run copy:auth",
+    "test": "react-scripts test",
+    "copy:auth": "cp ./node_modules/@esri/arcgis-rest-auth/dist/umd/auth.umd.min.js ./public/auth.umd.min.js",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -10,7 +10,6 @@ const { isAuthorizedSession } = require("../middleware/is-authorized");
 const { UserSession } = require("@esri/arcgis-rest-auth");
 
 // get the required config variables
-require('dotenv').config();
 const { CLIENT_ID, REDIRECT_URI } = process.env;
 const TOKEN_EXPIRATION_MS = 2592000000;
 
@@ -19,14 +18,14 @@ module.exports = function(userStore){
   // not currently used, but could be used to interact with user store
   // eg to validate that user should access the app before setting a session
   // or to get additional information from the store about the user
-  const { getUserForAGSUser, joinAGSSession } = userStore;
+  const { getUserForAGSUser } = userStore;
 
   // initiate user authorization, redirects user to ArcGIS to log in
   router.get("/authorize", function(req, res) {
-  UserSession.authorize({
-    clientId: CLIENT_ID,
-    redirectUri: REDIRECT_URI
-  }, res);
+    UserSession.authorize({
+      clientId: CLIENT_ID,
+      redirectUri: REDIRECT_URI
+    }, res);
   });
 
   // exchange code for the tokens, check if user exists, and store in session
@@ -36,13 +35,23 @@ module.exports = function(userStore){
       redirectUri: REDIRECT_URI
     }, req.query.code);
 
-    // could add additional validation here or
-    // fetch user info from store to encode in the session
+    // validate that the user exists, could add additional validation
+    const user = await getUserForAGSUser(userSession.username, userSession.portal);
+    
+    // if user exists, create authorized session
+    if(user && user.username){
+      // store the session
+      req.session.user = userSession.username;
+      req.session.agsSession = userSession.serialize();
+      return res.redirect('/trust-ags-server.html');
+    }
 
-    // store the session
-    req.session.user = userSession.username;
-    req.session.agsSession = userSession.serialize();
-    return res.redirect('/ags-auth-server.html');
+    // if user does not exist, return error
+    return res.status(403).json({
+      status: 403,
+      message: 'ArcGIS user does not have access to service'
+    });
+
   });
 
   // return user information, for now just the username

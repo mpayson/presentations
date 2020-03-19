@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Custom (username / password)</title>
+    <title>Trust ArcGIS - Server</title>
 
     <script>
       var dojoConfig = {
@@ -40,7 +40,7 @@
   <body>
     <div id="map-view">
       <div id="panel">
-        <h3 class="muted-text">ArcGIS Auth - Server</h3>
+        <h3 class="muted-text">Trust ArcGIS - Server</h3>
         <div>
           <h3 class="h-margin-sm">User</h3>
           <p id="un-display" class="inline-header">--</p>
@@ -63,7 +63,7 @@
     <div id="login-window">
       <form id="login-form">
         <h3>Log in</h3>
-        <calcite-button class="full" href="/ags-server/authorize">ArcGIS</calcite-button>
+        <calcite-button class="full" href="/trust-ags-server/authorize">ArcGIS</calcite-button>
       </form>
     </div>
 
@@ -76,7 +76,7 @@
     <script src="/common.js"></script>
     <script>
 
-      const SESSION_ID = '__ESRI_AUTH_SERVER_PATTERN_';
+      const SESSION_ID = '__ESRI_TRUST_AGS_CLIENT_PATTERN__';
 
       let state = {
         ags: null
@@ -98,7 +98,7 @@
       async function init(){
         let agsCredential;
         try{
-          agsCredential = await get('/ags-server/ags-credential', null, 'Get token / checked if logged in (normally done with redirect)', false);
+          agsCredential = await get('/trust-ags-server/ags-credential', null, 'Get token / checked if logged in (normally done with redirect)', false);
         } catch(e){
           // 401 is expected if not logged in, so don't take action
           if(e.status !== 401) genericErrorHandler(e);
@@ -108,7 +108,7 @@
         // now we know the user is authenticated, so let's get user info
         let username;
         try{
-          let res = await get('/ags-server/self', null, 'Get information about the user');
+          let res = await get('/trust-ags-server/self', null, 'Get information about the user');
           username = res.user;
         } catch(e){
           genericErrorHandler(e);
@@ -126,7 +126,7 @@
       document.querySelector('#logout').addEventListener('click', async function(){
         unDisplayEl.textContent = '--';
         logInEl.style.display = 'block';
-        post('/ags-server/logout', null, null, 'Log the user out');
+        post('/trust-ags-server/logout', null, null, 'Log the user out');
       })
 
       // load ArcGIS / maps and get resulting interfaces
