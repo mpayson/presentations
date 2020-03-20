@@ -31,6 +31,6 @@ const { getGeoJSON } = dataStore;
 getGeoJSON(); // pre-emptively fetch data
 
 // web-client is outside the server directory so it's easier to compare
-app.use(express.static(path.join(__dirname, 'client')));
+app.use(express.static(path.join(__dirname, '..', 'web-client', 'build')));
 
 app.listen(PORT, _ => console.log(`Extend AasdfrcGIS demo server listening on http://localhost:${PORT}`));

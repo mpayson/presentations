@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Search from 'calcite-react/Search';
 import { searchPortal } from '../services/MapService';
-import Loader from 'calcite-react/Loader';
 import FeatureLayerIcon from 'calcite-ui-icons-react/FeatureLayerIcon';
 import MapIcon from 'calcite-ui-icons-react/LayerMapIcon';
 import UnknownLayer from 'calcite-ui-icons-react/LayerBrokenIcon';

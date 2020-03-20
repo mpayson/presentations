@@ -1,6 +1,8 @@
+// const fetch = require("node-fetch");
 const { queryFeatures } = require("@esri/arcgis-rest-feature-layer");
 const { query } = require("winnow");
 
+// const DATA_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/NWS_Watches_Warnings_v1/FeatureServer/6/query?f=geojson&where=1%3D1&outFields=*&returnGeometry=true';
 const DATA_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/NWS_Watches_Warnings_v1/FeatureServer/6';
 const TTL = 60 * 60 * 1000 // one hour
 
@@ -17,15 +19,23 @@ async function getGeoJSON(){
   };
   
   if(!_cache._pending){
+    // _cache._pending = fetch(DATA_URL).then(res => res.json());
     _cache._pending = queryFeatures({
       url: DATA_URL,
       where: "1=1",
       returnGeometry: true,
       f: 'geojson'
-    }).catch(er => console.log(er));
+    })
   }
-  const geojson = await _cache._pending;
-
+  let geojson;
+  try {
+    geojson = await _cache._pending;
+  } catch(e){
+    console.log(e);
+    _cache._pending = null;
+    return;
+  }
+  
   _cache = {
     geojson,
     _expiration: new Date() + TTL,
