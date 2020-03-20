@@ -1,7 +1,7 @@
 # Auth Patterns Demo
 > A couple POC demos for validating users and accessing resources with ArcGIS
 
-### ⚠ A quick disclaimer
+### ⚠ A disclaimer
 These are quick POCs inferred from patterns we've seen implemented. Please closely evaluate the approaches in the context of your security posture and do not take the implementations as hardened or authoritative references for your production systems. Thanks and if you have any feedback, [drop a note](mailto:mpayson@esri.com)!
 
 ## App Patterns
