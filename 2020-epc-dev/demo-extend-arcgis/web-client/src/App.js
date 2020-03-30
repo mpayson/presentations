@@ -11,7 +11,7 @@ import TopNav, {
 import Form from './components/FormPanel';
 import ArcgisAccount, { ArcgisAccountMenuItem } from 'calcite-react/ArcgisAccount'
 import LoginWindow from './components/LoginWindow';
-import { signIn, getUser, getUserPortal } from './services/AuthService';
+import { signIn, getUser, getUserPortal, signOut } from './services/AuthService';
 import { MapTheme } from './config/ui';
 import {loadMap, addLegendWidget} from './services/MapService';
 
@@ -63,6 +63,16 @@ class App extends PureComponent {
     });
   }
 
+  _onSignoutClick = _ => {
+    this.setState({
+      session: null,
+      apiToken: null,
+      user: null,
+      portal: null
+    });
+    signOut();
+  }
+
   async componentDidMount(){
     this.view = await loadMap(this.mapViewRef.current, MapTheme);
     addLegendWidget(this.view, 'bottom-right');
@@ -81,7 +91,7 @@ class App extends PureComponent {
               <ArcgisAccount
                 user={this.state.user}
                 portal={this.state.portal}
-                onRequestSignOut={() => console.log('sign out clicked')}
+                onRequestSignOut={this._onSignoutClick}
                 hideSwitchAccount={true}>
                 <ArcgisAccountMenuItem>
                   Check out Github
