@@ -5,7 +5,7 @@ import Form from './components/FormPanel';
 import LoginWindow from './components/LoginWindow';
 import { signIn, signOut } from './services/AuthService';
 import { MapTheme } from './config/ui';
-import {loadMap, addSearchWidget, registerSession, addLayerListWidget} from './services/MapService';
+import {loadMap, addSearchWidget, registerSession, addLayerListWidget, mapFromOptions} from './services/MapService';
 import AppNav from './components/AppNav';
 
 const AppContainer = styled.div`
@@ -67,7 +67,8 @@ class App extends PureComponent {
     })
   }
 
-  _onSignoutClick = _ => {
+  _onSignoutClick = async _ => {
+    this.view.map = mapFromOptions(MapTheme.mapOptions);
     this.setState({
       session: null,
       apiToken: null
@@ -84,7 +85,7 @@ class App extends PureComponent {
           session={this.state.session}
           onLogout={this._onSignoutClick}/>
         <AppContainer>
-          {this.state.isMapUpdating && <LoaderBar/>}
+          {(this.state.isMapUpdating && !!this.state.session) && <LoaderBar/>}
           <MapContainer ref={this.mapViewRef}/>
           <Form apiToken={this.state.apiToken} view={this.view}/>
           {(!this.state.loaded && this.state.session) && <Loader/>}
