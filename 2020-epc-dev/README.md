@@ -1,8 +1,7 @@
 # 2020 EPC DEV
 > Resources from 2020 Esri Partner Conference and Developer Summit presentations
 
-## Presentations
-> *Note, videos to be uploaded*
+## Presentations *note, videos to be uploaded*
 
 ### Building Products with ArcGIS
 > high level patterns and reference schematics for building products with ArcGIS
