@@ -6,18 +6,18 @@ This demo shows two extension patterns, a Pro GeoProcessing (GP) tool and web ap
 ## Running
 
 Get the source code
-1. $ git clone https://github.com/mpayson/presentations.git
-2. $ cd 2020-epc-dev/demo-extend-arcgis
+1. `$ git clone https://github.com/mpayson/presentations.git`
+2. `$ cd 2020-epc-dev/demo-extend-arcgis`
 
 Start the server
-1. $ cd server
-2. $ npm install
-3. $ npm start
+1. `$ cd server`
+2. `$ npm install`
+3. `$ npm start`
 
 Start the web app (proxies to the server)
-1. $ cd web-client
-2. $ yarn install
-3. $ yarn start
+1. `$ cd web-client`
+2. `$ yarn install`
+3. `$ yarn start`
 
 Use the Pro Toolbox
 1. Update the API_BASE_URL to your server URL in `pro-gp-client/demo-extend-arcgis.pyt`
