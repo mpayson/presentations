@@ -119,6 +119,7 @@ function FormPanel({view, apiToken}){
       view.map = mapFromOptions(MapTheme.mapOptions);
       if(sketchLyr) view.map.add(sketch.layer);
     }
+    setLayers([]);
   }
 
   // on form submit, translate the layers from their ID to 
