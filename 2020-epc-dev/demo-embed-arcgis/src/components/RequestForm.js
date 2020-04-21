@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Panel from 'calcite-react/Panel';
 import styled from 'styled-components';
 import Form, {
   FormControl,
@@ -30,7 +29,7 @@ function RequestForm({onSubmit, success, spatialReference='102100'}){
       setFeatures(res.features);
     }
     getFeatures();
-  }, []);
+  }, [spatialReference]);
 
   function onSubmitClick(){
     const newFeature = features.find(f => f.attributes['site_name'] === school);

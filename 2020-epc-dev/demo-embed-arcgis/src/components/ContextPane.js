@@ -36,9 +36,8 @@ function ContextPane(){
   let path = location.pathname;
   let paths = path.split('/');
   const stage = paths.length > 1 ? paths[1] : null;
-  const user = paths.length > 2 ? paths[2] : null;
 
-  let lbsActive = !!stage && user !== 'request';
+  let lbsActive = !!stage;
   let infrActive = stage === 'user' || stage === 'realtime';
   let advActive = stage === 'realtime';
 

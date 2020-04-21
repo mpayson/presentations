@@ -29,7 +29,7 @@ function AppNav({titleSuffix, logo, session, onLogout}){
   return(
     <TopNav>
       <TopNavBrand src={navLogo}/>
-      <TopNavTitle>Extend ArcGIS Demo - {titleSuffix}</TopNavTitle>
+      <TopNavTitle>Embed ArcGIS Demo - {titleSuffix}</TopNavTitle>
       <TopNavList/>
       {!!userInfo && 
         <TopNavActionsList style={{ padding: 0 }}>

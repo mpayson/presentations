@@ -26,11 +26,11 @@ const dataStore = require('./models/data');
 const enrichRoutes = require('./routes/enrich');
 app.use('/enrich', enrichRoutes(dataStore));
 
-// load the datastore
-const { getGeoJSON } = dataStore;
-getGeoJSON(); // pre-emptively fetch data
+// load the datastore and pre-emptively fetch data
+const { hydrateCache } = dataStore;
+hydrateCache();
 
-// web-client is outside the server directory so it's easier to compare
+// web-client is outside the server directory so it's easier to compare with GP tool client
 app.use(express.static(path.join(__dirname, '..', 'web-client', 'build')));
 
-app.listen(PORT, _ => console.log(`Extend AasdfrcGIS demo server listening on http://localhost:${PORT}`));
+app.listen(PORT, _ => console.log(`Extend ArcGIS Demo server listening on http://localhost:${PORT}`));

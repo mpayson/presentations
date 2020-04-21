@@ -14,7 +14,6 @@ function UserRequestApp(){
       adds: [feature]
     });
     if(!results) return; // todo error handling
-    console.log(results);
     setSuccess(true);
   }
 

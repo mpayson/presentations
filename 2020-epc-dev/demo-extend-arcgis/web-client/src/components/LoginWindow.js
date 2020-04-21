@@ -29,6 +29,7 @@ const AboutText = () => (
   <h1 style={{textAlign: "center"}}>Hello! Please sign in</h1>
 )
 
+// TODO provide options for logging in with Enterprise or not logging in ("preview")
 const LoginWindow = ({onClick}) => (
   <Container>
     <CenterPanel>

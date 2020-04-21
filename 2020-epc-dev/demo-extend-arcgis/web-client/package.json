@@ -6,7 +6,7 @@
     "@esri/arcgis-rest-auth": "^2.8.1",
     "@esri/arcgis-rest-portal": "^2.8.2",
     "@esri/arcgis-rest-request": "^2.0.0",
-    "calcite-react": "^0.40.0",
+    "calcite-react": "^0.50.0",
     "calcite-ui-icons-react": "^0.11.0",
     "esri-loader": "^2.10.0",
     "react": "^16.8.6",

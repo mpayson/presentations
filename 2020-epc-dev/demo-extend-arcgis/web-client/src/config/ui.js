@@ -65,9 +65,11 @@ function getRenderer(geometryType){
 
 const ResultConfig = {
   title: 'Results',
-  pointRenderer: getRenderer('point'),
-  lineRenderer: getRenderer('polyline'),
-  polygonRenderer: getRenderer('polygon'),
+  rendererByGeometryType: {
+    'point': getRenderer('point'),
+    'polyline': getRenderer('polyline'),
+    'polygon': getRenderer('polygon')
+  },
   popupTemplate: {
     title: "{Event}",
     content: "{Severity} event with {Certainty} certainty"

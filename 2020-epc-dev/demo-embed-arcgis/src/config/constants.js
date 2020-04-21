@@ -14,19 +14,6 @@ const statusRenderer = {
   field: 'maintpriority',
   legendOptions: {title: 'Priority'},
   uniqueValueInfos: [{
-  //   value: 'none',
-  //   label: 'None',
-  //   symbol: {
-  //     color: '#7f7f7f',
-  //     type: 'simple-marker',
-  //     style: 'diamond',
-  //     size: '20px',
-  //     outline: {
-  //       color: '#2b2b2b',
-  //       width: '1.5px'
-  //     }
-  //   }
-  // }, {
     value: 'low',
     label: 'Low',
     symbol: {

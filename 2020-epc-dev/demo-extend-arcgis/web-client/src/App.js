@@ -1,19 +1,12 @@
 import React, {PureComponent} from 'react';
-import Loader from './components/Loader';
+import {Loader, LoaderBar} from './components/Loaders';
 import styled from 'styled-components';
-import Logo from './resources/logo.svg';
-import TopNav, {
-  TopNavBrand,
-  TopNavTitle,
-  TopNavActionsList,
-  TopNavList,
-} from 'calcite-react/TopNav';
 import Form from './components/FormPanel';
-import ArcgisAccount, { ArcgisAccountMenuItem } from 'calcite-react/ArcgisAccount'
 import LoginWindow from './components/LoginWindow';
-import { signIn, getUser, getUserPortal, signOut } from './services/AuthService';
+import { signIn, signOut } from './services/AuthService';
 import { MapTheme } from './config/ui';
-import {loadMap, addLegendWidget} from './services/MapService';
+import {loadMap, addSearchWidget, registerSession, addLayerListWidget} from './services/MapService';
+import AppNav from './components/AppNav';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -28,85 +21,70 @@ const MapContainer = styled.div`
   flexGrow: 1;
 `;
 
+// TODO, refactor to functions & hooks!
 class App extends PureComponent {
 
   state = {
-    loaded: false
+    loaded: false,
+    isMapUpdating: false
   }
 
   constructor(props){
     super(props);
     this.mapViewRef = React.createRef();
-    this.state.session = props.previousSession;
-    if(this.state.session) this._onSession(this.state.session);
+    if(props.previousSession){
+      this.state.session = props.previousSession.agsSession;
+      this.state.apiToken = props.previousSession.apiSession;
+    }
+  }
+
+  async componentDidMount(){
+    // if an existing session, make sure it's registered with the API
+    if(this.props.previousSession){
+      await registerSession(this.state.session);
+    }
+    // load the map
+    this.view = await loadMap(this.mapViewRef.current, MapTheme);
+    addLayerListWidget(this.view, 'bottom-right');
+    addSearchWidget(this.view, 'top-right', 0, true);
+    this.view.when(this._onMapLoad);
+  }
+
+  onMapUpdateChange = (newValue) => {
+    this.setState({isMapUpdating: newValue});
   }
 
   _onMapLoad = () => {
     this.setState({loaded: true});
+    this.viewUpdateHandler = this.view.watch("updating", this.onMapUpdateChange);
   }
 
   _onSigninClick = async () => {
     const {agsSession, apiSession} = await signIn();
-    this._onSession({agsSession, apiSession});
-  }
-
-  _onSession = async ({agsSession, apiSession}) => {
-    const [user, portal] = await Promise.all([
-      getUser(agsSession), getUserPortal(agsSession)
-    ]);
-    console.log(user, portal);
     this.setState({
       session: agsSession,
-      apiToken: apiSession,
-      user,
-      portal
-    });
+      apiToken: apiSession
+    })
   }
 
   _onSignoutClick = _ => {
     this.setState({
       session: null,
-      apiToken: null,
-      user: null,
-      portal: null
+      apiToken: null
     });
     signOut();
   }
 
-  async componentDidMount(){
-    this.view = await loadMap(this.mapViewRef.current, MapTheme);
-    addLegendWidget(this.view, 'bottom-right');
-    this.view.when(this._onMapLoad);
-  }
-
   render(){
+
     return( 
       <>
-        <TopNav>
-          <TopNavBrand src={Logo}/>
-          <TopNavTitle>Extend ArcGIS Demo - Web</TopNavTitle>
-          <TopNavList/>
-          {this.state.user &&
-            <TopNavActionsList style={{ padding: 0 }}>
-              <ArcgisAccount
-                user={this.state.user}
-                portal={this.state.portal}
-                onRequestSignOut={this._onSignoutClick}
-                hideSwitchAccount={true}>
-                <ArcgisAccountMenuItem>
-                  Check out Github
-                </ArcgisAccountMenuItem>
-                <ArcgisAccountMenuItem>
-                  Watch the presentation
-                </ArcgisAccountMenuItem>
-                <ArcgisAccountMenuItem>
-                  List on Marketplace
-                </ArcgisAccountMenuItem>
-              </ArcgisAccount>
-            </TopNavActionsList>
-          }
-        </TopNav>
+        <AppNav
+          title={'Extend ArcGIS Demo'}
+          session={this.state.session}
+          onLogout={this._onSignoutClick}/>
         <AppContainer>
+          {this.state.isMapUpdating && <LoaderBar/>}
           <MapContainer ref={this.mapViewRef}/>
           <Form apiToken={this.state.apiToken} view={this.view}/>
           {(!this.state.loaded && this.state.session) && <Loader/>}

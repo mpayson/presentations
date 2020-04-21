@@ -1,12 +1,13 @@
-import React, {PureComponent} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import ContextPane from './components/ContextPane';
-import LbsApp from './apps/LbsApp';
+import LbsWorkerApp from './apps/LbsWorkerApp';
 import UserRequestApp from './apps/UserRequestApp';
-import UserDispatchApp from './apps/UserDispatchApp';
-import UserWorkerApp from './apps/UserWorkerApp';
+import DispatchApp from './apps/DispatchApp';
+import WorkerApp from './apps/WorkerApp';
 import RealTimeRequestApp from './apps/RealTimeRequestApp';
+import { CenteredContainer } from './components/Common';
 
 const AppDiv = styled.div`
   width: 75%;
@@ -21,26 +22,30 @@ const ContextDiv = styled.div`
   padding: 0rem 1rem;
 `
 
-class App extends PureComponent {
+const Home = () => (
+  <CenteredContainer>
+    <h1>Embed ArcGIS Demo</h1>
+    <p>This demo has multiple applications that progressively add ArcGIS capabilities in the context of a (very simple) maintenance request workflow.</p>
+    <p>When one of the apps is open, the right pane will highlight (unfade) the components used in that application.</p>
+    <b><i>Select one of the apps to the right to get started!</i></b>
+  </CenteredContainer>
+)
 
-  render(){
-    return(
-      <Router>
-        <AppDiv>
-          <Route path="/lbs" component={LbsApp}/>
-          <Route path="/user/request" component={UserRequestApp}/>
-          <Route path="/user/dispatch" component={UserDispatchApp}/>
-          <Route path="/user/worker" component={UserWorkerApp}/>
-          <Route path="/realtime/request" component={RealTimeRequestApp}/>
-          <Route path="/realtime/worker" component={UserWorkerApp}/>
-        </AppDiv>
-        <ContextDiv>
-          <ContextPane/>
-        </ContextDiv>
-      </Router>
-    )
-  }
+const Routes = () => (
+  <Router>
+    <AppDiv>
+      <Route path="/" exact component={Home}/>
+      <Route path="/lbs" component={LbsWorkerApp}/>
+      <Route path="/user/request" component={UserRequestApp}/>
+      <Route path="/user/dispatch" component={DispatchApp}/>
+      <Route path="/user/worker" component={WorkerApp}/>
+      <Route path="/realtime/request" component={RealTimeRequestApp}/>
+      <Route path="/realtime/worker" component={WorkerApp}/>
+    </AppDiv>
+    <ContextDiv>
+      <ContextPane/>
+    </ContextDiv>
+  </Router>
+)
 
-}
-
-export default App;
+export default Routes;

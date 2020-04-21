@@ -25,7 +25,6 @@ export function getExistingSession(){
     // register with JS API and return session infos, else return null
     if(agsSession.tokenExpires > new Date()){
       const agsSessionClass = new UserSession(agsSession);
-      registerSession(agsSessionClass);
       return {
         agsSession: agsSessionClass,
         apiSession
@@ -36,6 +35,10 @@ export function getExistingSession(){
   }
   return undefined;
 }
+
+export {
+  registerSession
+};
 
 export async function signIn(){
   const {clientId} = env;
@@ -52,7 +55,7 @@ export async function signIn(){
   ]);
 
   saveSession({agsSession, apiSession});
-  return { agsSession, apiSession};
+  return { agsSession, apiSession };
 }
 
 export function getUser(session){
@@ -77,7 +80,6 @@ function saveSession({agsSession, apiSession}){
     apiSession
   }))
 }
-
 
 function deleteSession(){
   localStorage.removeItem(SESSION_ID);

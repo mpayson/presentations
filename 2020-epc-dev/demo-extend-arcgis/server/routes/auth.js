@@ -2,6 +2,8 @@
    * ArcGIS TOKEN AUTH
    * Sample APIs to show a pattern for validating
    * access from an existing ArcGIS token
+   * NOTE there are more secure auth approaches,
+   * please evaluate this in the context of security posture
 ****************************************************/
 const express = require('express');
 const router = express.Router();
@@ -9,7 +11,6 @@ const jwt = require('jsonwebtoken');
 const { request, cleanUrl } = require("@esri/arcgis-rest-request");
 const { UserSession } = require("@esri/arcgis-rest-auth");
 const { isAuthorizedJWT } = require("../middleware/is-authorized");
-const { getServerRootUrl } = require("../utils/utils");
 
 // load and setup config variables from .env file
 require('dotenv').config();
@@ -24,13 +25,8 @@ module.exports = function({validateAccess}){
     const { expires, ssl, token, userId } = req.body;
     const server = cleanUrl(req.body.server);
     
-    // there seems to be an issue where time stamp is parsing an hour earlier
-    // maybe due to time change and how I configured my machines, kinda frustrating...
-    // for demo purposes safe assumption that token hasn't expired anyway
-    const adjExpires = expires + (60 * 60 * 1000)
     const session = UserSession.fromCredential({
-      expires: adjExpires,
-      server, ssl, token, userId
+      expires, server, ssl, token, userId
     });
 
     // check that the token is valid and

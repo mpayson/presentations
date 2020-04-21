@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Panel from 'calcite-react/Panel';
 import styled from 'styled-components';
 import {
   H3ntm,
