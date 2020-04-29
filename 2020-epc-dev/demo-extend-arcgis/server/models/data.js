@@ -5,12 +5,15 @@ const { fieldTypeToEsriType } = require('../utils/utils');
 const DATA_URL = 'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/NWS_Watches_Warnings_v1/FeatureServer/6/query?f=geojson&where=1%3D1&outFields=*&returnGeometry=true'
 const TTL = 60 * 60 * 1000 // one hour
 
+// in-memory cache for POC purposes
 let _cache = {
   geojson: null,
+  metadata: null,
   _expiration: new Date(),
   _pending: null
 };
 
+// get data from the service
 async function fetchData(){
   const response = await fetch(DATA_URL);
   const geojson = await response.json();
@@ -18,7 +21,8 @@ async function fetchData(){
   return {geojson, metadata: queryResults.metadata};
 }
 
-async function hydrateCache(){
+// hydrate the cache with the data
+async function hydrateCache(ttl=TTL){
   if(!_cache._pending){
     _cache._pending = fetchData();
   }
@@ -35,15 +39,16 @@ async function hydrateCache(){
   _cache = {
     geojson,
     metadata,
-    _expiration: new Date() + TTL,
+    _expiration: new Date() + ttl,
     _pending: null
   }
   return _cache;
 }
 
+// get only the relevant objects from the cache
 async function getCache(){
   let cache;
-  if(_cache._expiration < new Date() || !_cache.geojson){
+  if(!_cache.geojson || _cache._expiration < new Date()){
     cache = await hydrateCache();
   } else {
     cache = _cache;
@@ -85,7 +90,7 @@ async function enrich(featureSet, where){
   let oidField = 'ObjectId';
   if(fields){
     oidFieldInfo = fields.find(f => f.type === 'esriFieldTypeOID');
-    oidField = oidFieldInfo ? oidFieldInfo.name : 'ObjectId';
+    oidField = (oidFieldInfo && oidFieldInfo.name) ? oidFieldInfo.name : 'ObjectId';
   }
 
   let outFeatures = [];

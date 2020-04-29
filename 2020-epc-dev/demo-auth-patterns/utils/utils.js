@@ -11,7 +11,7 @@ function getJWTForRequest(req){
 // https://github.com/Esri/arcgis-rest-js/blob/25778e3e6b16d73cc22a79a7b9bc1c97f4f90ac4/packages/arcgis-rest-auth/src/UserSession.ts#L450
 function authorizeWithState(options, response){
   const { portal, clientId, duration, redirectUri, state } = {
-    ...{ portal: "https://arcgis.com/sharing/rest", duration: 20160 },
+    ...{ portal: "https://arcgis.com/sharing/rest", duration: 1440 },
     ...options
   };
 

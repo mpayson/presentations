@@ -11,7 +11,8 @@ const { UserSession } = require("@esri/arcgis-rest-auth");
 
 // get the required config variables
 const { CLIENT_ID, REDIRECT_URI } = process.env;
-const TOKEN_EXPIRATION_MS = 2592000000;
+const TOKEN_EXPIRATION_MS = 7200000;
+const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 1440;
 
 module.exports = function(userStore){
 
@@ -24,7 +25,8 @@ module.exports = function(userStore){
   router.get("/authorize", function(req, res) {
     UserSession.authorize({
       clientId: CLIENT_ID,
-      redirectUri: REDIRECT_URI
+      redirectUri: REDIRECT_URI,
+      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS
     }, res);
   });
 
@@ -32,7 +34,8 @@ module.exports = function(userStore){
   router.get("/redirect", async function(req, res) {
     const userSession = await UserSession.exchangeAuthorizationCode({
       clientId: CLIENT_ID,
-      redirectUri: REDIRECT_URI
+      redirectUri: REDIRECT_URI,
+      refreshTokenTTL: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS
     }, req.query.code);
 
     // validate that the user exists, could add additional validation

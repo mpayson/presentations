@@ -13,6 +13,7 @@ const { authorizeWithState, getJWTForRequest } = require("../utils/utils")
 // load and setup config variables from .env file
 const { CLIENT_ID, CONNECT_REDIRECT_URI, SESSION_SECRET } = process.env;
 const TOKEN_EXPIRATION_MINUTES = 60;
+const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 1440;
 
 // Expects a userstore method to validate credentials
 // and join ArcGIS session data
@@ -53,6 +54,7 @@ module.exports = function (userStore){
     authorizeWithState({
       clientId: CLIENT_ID,
       redirectUri: CONNECT_REDIRECT_URI,
+      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS,
       state: token
     }, res);
   });
@@ -74,7 +76,8 @@ module.exports = function (userStore){
     }
     const userSession = await UserSession.exchangeAuthorizationCode({
       clientId: CLIENT_ID,
-      redirectUri: CONNECT_REDIRECT_URI
+      redirectUri: CONNECT_REDIRECT_URI,
+      refreshTokenTTL: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS
     }, req.query.code);
     joinAGSSession(username, userSession);
     return res.redirect('/connect-ags-unpw.html');

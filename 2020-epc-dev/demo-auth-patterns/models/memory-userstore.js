@@ -57,7 +57,7 @@ async function getAGSSessionForUser(username){
     // For now, clear AGS session if refresh token expired
     // In production, can run background task to have
     // the refresh token refresh itself
-    if(session.refreshTokenExpires < new Date){
+    if(session.refreshTokenExpires < new Date()){
       joinAGSSession(username, null);
       return undefined;
     }

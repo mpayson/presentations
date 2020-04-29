@@ -31,7 +31,7 @@ app.use(
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {maxAge: 2592000000 }, // 30 days in milliseconds
+    cookie: {maxAge: 7200000 }, // 2 hours in milliseconds
     // store session data in a secure, encrypted file
     // sessions will be loaded from these files and decrypted
     // at the end of every request the state of `request.session`
