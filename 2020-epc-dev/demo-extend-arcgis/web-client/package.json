@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@esri/arcgis-rest-auth": "^2.8.1",
-    "@esri/arcgis-rest-portal": "^2.8.2",
-    "@esri/arcgis-rest-request": "^2.0.0",
-    "calcite-react": "^0.50.0",
-    "calcite-ui-icons-react": "^0.11.0",
+    "@esri/arcgis-rest-auth": "^2.13.1",
+    "@esri/arcgis-rest-portal": "^2.13.1",
+    "@esri/arcgis-rest-request": "^2.13.1",
+    "@esri/solution-deployer": "^0.9.2",
+    "calcite-react": "^0.51.1",
+    "calcite-ui-icons-react": "^0.14.0",
     "esri-loader": "^2.10.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -17,7 +18,7 @@
     "start": "react-scripts start",
     "postinstall": "npm run copy:auth",
     "prebuild": "npm run copy:auth",
-    "copy:auth": "cp ./node_modules/@esri/arcgis-rest-auth/dist/umd/auth.umd.min.js ./public/auth.umd.min.js",
+    "copy:auth": "ncp ./node_modules/@esri/arcgis-rest-auth/dist/umd/auth.umd.min.js ./public/auth.umd.min.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -37,5 +38,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5000",
+  "devDependencies": {
+    "ncp": "^2.0.0"
+  }
 }

@@ -21,6 +21,7 @@ module.exports = function({getOptionsForField, enrich}){
     const where = `${whereField} = '${category}'`;
     const resultFeatureSet = await enrich(fs, where);
     res.json(resultFeatureSet);
-  })
+  });
+
   return router;
 }

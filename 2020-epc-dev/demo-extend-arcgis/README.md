@@ -12,12 +12,14 @@ Get the source code
 Start the server
 1. `$ cd server`
 2. `$ npm install`
-3. `$ npm start`
+3. Update [`.env.example`](/2020-epc-dev/demo-extend-arcgis/server/.env.example) and rename to `.env`
+4. `$ npm start`
 
 Start the web app (proxies to the server)
 1. `$ cd web-client`
 2. `$ yarn install`
-3. `$ yarn start`
+3. (optional) update [`environment.js`](/2020-epc-dev/demo-extend-arcgis/web-client/src/config/environment.js) with an App ID
+4. `$ yarn start`
 
 Use the Pro Toolbox
 1. Update the API_BASE_URL to your server URL in `pro-gp-client/demo-extend-arcgis.pyt`

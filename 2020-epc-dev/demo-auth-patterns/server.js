@@ -10,10 +10,12 @@ if(isDev) require('dotenv').config(); // load dev variables, otherwise they'll b
 // express imports
 const path = require("path");
 const express = require ("express");
-const cors = require('cors')
+const helmet = require('helmet');
+const cors = require('cors');
 const session = require("express-session");
 const SessionFileStore = require("session-file-store");
 const app = express();
+app.use(helmet());
 
 // setup file storeage for user sessions
 const FileStore = SessionFileStore(session);
@@ -56,4 +58,4 @@ app.use('/connect', connectRouter(memoryUserStore));
 // web-client is outside the server directory so it's easier to compare
 app.use(cors(), express.static(path.join(__dirname, 'client')));
 
-app.listen(PORT, _ => console.log(`Extend AasdfrcGIS demo server listening on http://localhost:${PORT}`));
+app.listen(PORT, _ => console.log(`Demo auth patterns server listening on http://localhost:${PORT}`));

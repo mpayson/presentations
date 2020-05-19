@@ -1,3 +1,9 @@
+/****************************************************
+   * Data.js
+   * Core logic for joining requests to the sample dataset
+   * Has a simple in-memory cache plus a (not optimized) spatial join API
+****************************************************/
+
 const fetch = require("node-fetch");
 const { query } = require("winnow");
 const { fieldTypeToEsriType } = require('../utils/utils');

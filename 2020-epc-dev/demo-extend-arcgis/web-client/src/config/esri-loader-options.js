@@ -1,6 +1,6 @@
 const options = {
-  url: "https://js.arcgis.com/next/",
-  css: "https://js.arcgis.com/next/esri/themes/light/main.css"
+  url: "https://js.arcgis.com/4.15/",
+  css: "https://js.arcgis.com/4.15/esri/themes/light/main.css"
 }
 
 export default options;

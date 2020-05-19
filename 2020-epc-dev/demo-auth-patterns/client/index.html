@@ -56,14 +56,6 @@
       <div style="width: 100%; text-align: center">
         <h1>Authentication Pattern Demos</h1>
       </div>
-      <h3>App-tier / App login</h3>
-      <div id="grid">
-        <calcite-card class="grid-item">
-          <h3 slot="title">App-tier Service Proxy</h3>
-          <span slot="subtitle">Use a service proxy hosted by ArcGIS Online to access location services for all users</span>
-          <calcite-button slot="footer-leading" width="full" href="/ags-auth-proxy.html">Explore</calcite-button>
-        </calcite-card>
-      </div>
       <h3>User-tier / User login</h3>
       <div id="grid">
         <calcite-card class="grid-item">
@@ -81,6 +73,14 @@
           <span slot="subtitle">Allow users to log in with ArcGIS then use the resulting tokens to validate users in a custom identity store (in this case, a simple memory store)</span>
           <calcite-button slot="footer-leading" href="/trust-ags-server.html">Server-based</calcite-button>
           <calcite-button slot="footer-trailing" href="/trust-ags-client.html">Browser-based</calcite-button>
+        </calcite-card>
+      </div>
+      <h3>App-tier / App login</h3>
+      <div id="grid">
+        <calcite-card class="grid-item">
+          <h3 slot="title">App-tier Service Proxy</h3>
+          <span slot="subtitle">Use a service proxy hosted by ArcGIS Online to access location services for all users</span>
+          <calcite-button slot="footer-leading" width="full" href="/ags-auth-proxy.html">Explore</calcite-button>
         </calcite-card>
       </div>
     </div>

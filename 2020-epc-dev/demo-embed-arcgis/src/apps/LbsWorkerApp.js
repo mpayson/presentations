@@ -15,6 +15,8 @@ function LbsWorkerApp(){
 
   useEffect(_ => {
     if(!view) return;
+
+    // add the layer to the map
     const lyr = getGeoJSONLayer(jsonUrl, {
       renderer: statusRenderer,
       definitionExpression: needsMaintDefExp,
@@ -23,10 +25,13 @@ function LbsWorkerApp(){
     });
     view.map.layers.add(lyr);
     setLayer(lyr);
+    
+    // remove the layer on dismount
     return function cleanUp(){
       if(!lyr) return;
       view.map.layers.remove(lyr);
     }
+    
   }, [view])
 
   return (

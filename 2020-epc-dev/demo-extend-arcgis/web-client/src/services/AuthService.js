@@ -49,10 +49,11 @@ export async function signIn(){
     redirectUri: `${window.location.origin}/redirect.html`
   });
 
-  const [apiSession, _] = await Promise.all([
+  const resolved = await Promise.all([
     exchangeSessionForAPIToken(agsSession),
     registerSession(agsSession)
   ]);
+  const apiSession = resolved[0];
 
   saveSession({agsSession, apiSession});
   return { agsSession, apiSession };

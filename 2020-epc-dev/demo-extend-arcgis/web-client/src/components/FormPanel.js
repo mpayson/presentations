@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Panel from 'calcite-react/Panel';
+import Button from 'calcite-react/Button';
+import SaveIcon from 'calcite-ui-icons-react/SaveIcon';
+import LaunchIcon from 'calcite-ui-icons-react/LaunchIcon';
 import RequestForm from './RequestForm';
 import ItemBrowser from './ItemBrowser';
 import {
@@ -14,9 +17,13 @@ import {
   mapFromOptions,
   layerFromItemJson,
   layerToFeatureSetJSON,
-  layerFromFeatureSet
+  layerFromFeatureSet,
+  createSolutionScaffold,
+  layerFromId
 } from '../services/MapService';
 import { MapTheme, ResultConfig } from '../config/ui';
+import env from '../config/environment';
+const { solutionTemplateId } = env;
 
 const SidePanel = styled(Panel)`
   position: absolute;
@@ -35,14 +42,24 @@ const SketchContainer = styled.div`
   background: ${props => props.theme.palette.white};
 `
 
+// TODO put this in a better place at some point
+const SaveButton = styled(Button)`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+`
+
 const defaultConfig = getSkeletonQuestionConfig();
 
 // This defines the side form panel and houses the map logic for the form (for now)
-function FormPanel({view, apiToken}){
+function FormPanel({view, apiToken, session}){
   const sketchRef = useRef(null);
   const sketchElRef = useRef(null);
   const [questionConfig, setQuestionConfig] = useState(defaultConfig);
   const [layers, setLayers] = useState([]);
+  const [resultLayer, setResultLayer] = useState(null);
+  const [solutionStatus, setSolutionStatus] = useState(null);
+  const [solutionResult, setSolutionResult] = useState(null);
 
   // when the apiToken gets defined, get question config
   useEffect(_ => {
@@ -120,6 +137,9 @@ function FormPanel({view, apiToken}){
       if(sketchLyr) view.map.add(sketch.layer);
     }
     setLayers([]);
+    setResultLayer(null);
+    setSolutionStatus(null);
+    setSolutionResult(null);
   }
 
   // on form submit, translate the layers from their ID to 
@@ -146,7 +166,6 @@ function FormPanel({view, apiToken}){
   }
 
   // update the UI when enrichment is complete
-  // TODO do error handling
   function onEnrichResults(results){
     if(!results) return;
     const { title, popupTemplate, rendererByGeometryType } = ResultConfig;
@@ -154,6 +173,40 @@ function FormPanel({view, apiToken}){
     const renderer = rendererByGeometryType[lyr.geometryType];
     lyr.renderer = renderer;
     view.map.add(lyr);
+    setResultLayer(lyr);
+  }
+  
+  // deploy the solution template as scaffolding and save the result layer data
+  // into the deployed layer
+  async function onSaveResults(){
+    const { solutionInfo, itemInfo } = await createSolutionScaffold(solutionTemplateId, {
+      progressCallback: setSolutionStatus
+    });
+    if(!solutionInfo.templates || solutionInfo.templates.length < 1){
+      return;
+    }
+    const lyrInfo = solutionInfo.templates.find(t => 
+      t.type === 'Feature Service'  
+    );
+    const lyr = layerFromId(lyrInfo.itemId);
+    const edits = await resultLayer.queryFeatures({where: "1=1", returnGeometry: true});
+    try {
+      await lyr.applyEdits({addFeatures: edits.features});
+      setSolutionResult(itemInfo);
+      setSolutionStatus(null);
+    } catch(e){
+      console.log(e);
+    }
+  }
+
+  let saveButton;
+  if(solutionResult){
+  saveButton = <SaveButton icon={<LaunchIcon size={14}/>} iconPosition="before" green target="_blank" href={solutionResult.url}>Check it out!</SaveButton>
+  } else if(resultLayer && resultLayer.geometryType === 'point'){ // only have point solution template for now
+    const isExecuting = solutionStatus !== null;
+    saveButton = <SaveButton onClick={onSaveResults} icon={<SaveIcon size={14}/>} iconPosition="before" clear small disabled={isExecuting}>
+      {isExecuting ? `Creating... ${solutionStatus.toFixed(0)}%` : 'Save'}
+    </SaveButton>
   }
 
   return(
@@ -161,6 +214,7 @@ function FormPanel({view, apiToken}){
       <SketchContainer ref={sketchElRef}/>
       <SidePanel>
         <h3 className="no-top-margin">Form</h3>
+        {saveButton}
         <RequestForm
           layers={layers}
           questionConfig={questionConfig}

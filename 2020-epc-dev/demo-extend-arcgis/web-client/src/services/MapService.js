@@ -3,7 +3,9 @@
 import {loadModules} from 'esri-loader';
 import options from '../config/esri-loader-options';
 import { UserSession } from '@esri/arcgis-rest-auth';
-import { SearchQueryBuilder, searchItems } from '@esri/arcgis-rest-portal';
+import { SearchQueryBuilder, searchItems, getItemData } from '@esri/arcgis-rest-portal';
+import { getUserPortal } from './AuthService';
+import { deploySolution } from '@esri/solution-deployer';
 
 let _pModules;
 
@@ -110,6 +112,14 @@ export function layerFromFeatureSet(fsJson, layerOptions){
   return t;
 }
 
+export function layerFromId(itemId, layerOptions){
+  _moduleCheck(_FeatureLayer, "You must register an authenticated session before creating layers");
+  return new _FeatureLayer({
+    portalItem: {id: itemId},
+    ...layerOptions
+  });
+}
+
 export async function layerFromItemJson(itemJson){
   _moduleCheck(_Layer, "You must register an authenticated session before loading the layer");
   const portalItem = await portalItemFromJson(itemJson);
@@ -157,7 +167,11 @@ export const DEFAULT_SKETCH_LAYER_ID = "sketch-lyr-id";
 
 export function addSketch(view, container, sketchOptions, layerOptions){
   _moduleCheck(_Sketch, "You must register an authenticated session before sketching");
-  const layer = new _GraphicsLayer({id: DEFAULT_SKETCH_LAYER_ID, ...layerOptions});
+  const layer = new _GraphicsLayer({
+    id: DEFAULT_SKETCH_LAYER_ID, 
+    listMode: 'hide',
+    ...layerOptions
+  });
   view.map.add(layer);
   const sketch = new _Sketch({
     layer,
@@ -172,7 +186,7 @@ export function addSketch(view, container, sketchOptions, layerOptions){
 }
 
 export async function searchPortal(searchString){
-  _moduleCheck(_restSession, "You must register an authenicated session before querying the portal");
+  _moduleCheck(_restSession, "You must register an authenticated session before querying the portal");
   let query = new SearchQueryBuilder()
     .match(_restSession.username)
     .in("owner")
@@ -201,6 +215,19 @@ export async function searchPortal(searchString){
   });
   return response.results;
 
+}
+
+export async function createSolutionScaffold(solutionId, options){
+  _moduleCheck(_restSession, "You must register an authenticated session before creating a template");
+  const itemId = await deploySolution(solutionId, _restSession, options);
+  const pItemData = getItemData(itemId, {authentication: _restSession});
+  const pPortal = getUserPortal(_restSession);
+  const [itemData, portal] = await Promise.all([
+    pItemData, pPortal
+  ]);
+  const url = `https://${portal.urlKey}.${portal.customBaseUrl}/home/item.html?id=${itemId}`;
+  const itemInfo = {url, id: itemId}
+  return { solutionInfo: itemData, itemInfo };
 }
 
 function addExpandWidget(view, widget, iconClass){

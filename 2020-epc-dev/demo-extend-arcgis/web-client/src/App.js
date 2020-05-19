@@ -87,7 +87,7 @@ class App extends PureComponent {
         <AppContainer>
           {(this.state.isMapUpdating && !!this.state.session) && <LoaderBar/>}
           <MapContainer ref={this.mapViewRef}/>
-          <Form apiToken={this.state.apiToken} view={this.view}/>
+          <Form apiToken={this.state.apiToken} session={this.state.session} view={this.view}/>
           {(!this.state.loaded && this.state.session) && <Loader/>}
           {!this.state.session && <LoginWindow onClick={this._onSigninClick}/>}
         </AppContainer>
