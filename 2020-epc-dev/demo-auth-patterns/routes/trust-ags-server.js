@@ -11,8 +11,10 @@ const { UserSession } = require("@esri/arcgis-rest-auth");
 
 // get the required config variables
 const { CLIENT_ID, REDIRECT_URI } = process.env;
+
+// make TTLs short for demo purposes
 const TOKEN_EXPIRATION_MS = 7200000;
-const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 1440;
+const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300;
 
 module.exports = function(userStore){
 
@@ -26,7 +28,7 @@ module.exports = function(userStore){
     UserSession.authorize({
       clientId: CLIENT_ID,
       redirectUri: REDIRECT_URI,
-      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS
+      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS / 60
     }, res);
   });
 
