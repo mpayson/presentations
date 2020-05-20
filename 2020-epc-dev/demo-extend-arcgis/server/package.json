@@ -4,7 +4,7 @@
   "description": "Quick custom API implementation to show a couple extension patterns with ArcGIS",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=production node server.js",
+    "start": "node server.js",
     "start:dev": "nodemon server.js",
     "predeploy": "npm run build:webclient && npm run copy:webclient",
     "copy:webclient": "cp -R ../web-client/build ./client",
