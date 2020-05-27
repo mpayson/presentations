@@ -14,7 +14,7 @@ const Container = styled(CenteredContainer)`
 
 // in production, may have multiple layers depending on if there are multiple projects
 // or if dispatchers should only have access to a subset of projects
-const lyrUrl = 'https://services.arcgis.com/q7zPNeKmTWeh7Aor/arcgis/rest/services/Cambridge_Public_School_Locations/FeatureServer/0';
+const lyrUrl = 'https://services8.arcgis.com/uGiBf7iLew733Wn6/arcgis/rest/services/Cambridge_Public_School_Locations/FeatureServer/0';
 
 const initSession = getExistingSession();
 

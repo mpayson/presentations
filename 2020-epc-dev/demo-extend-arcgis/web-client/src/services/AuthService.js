@@ -11,13 +11,12 @@ import {
 import env from '../config/environment';
 import { exchangeSessionForAPIToken } from "./APIService";
 
-const SESSION_ID = "_my_awesome_demo_";
+const SESSION_ID = "_extend_arcgis_demo_";
 
 // check if there's an existing session
 export function getExistingSession(){
   const serializedSession = localStorage.getItem(SESSION_ID);
   if(serializedSession !== null && serializedSession !== "undefined"){
-
     // need both arcgis and api session info, will have same expires
     let {agsSession, apiSession} = JSON.parse(serializedSession);
     agsSession.tokenExpires = new Date(agsSession.tokenExpires);

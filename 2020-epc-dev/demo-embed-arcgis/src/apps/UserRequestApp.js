@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import RequestForm from '../components/RequestForm';
 import { applyEdits } from '@esri/arcgis-rest-feature-layer';
 
-const editUrl = 'https://services.arcgis.com/q7zPNeKmTWeh7Aor/arcgis/rest/services/PUBLIC_Cambridge_Public_School_Maintenance_Requests/FeatureServer/0';
+const editUrl = 'https://services8.arcgis.com/uGiBf7iLew733Wn6/arcgis/rest/services/PUBLIC_Cambridge_Public_School_Maintenance_Requests/FeatureServer/0';
 
 function UserRequestApp(){
 

@@ -17,7 +17,7 @@ const Container = styled(CenteredContainer)`
 // and would need to query for the layer for the user. or, if limited concern about giving 
 // all workers access to the same layer and instead limiting what they see, could set definition
 // expression to only fetch features relevant to the worker
-const lyrUrl = 'https://services.arcgis.com/q7zPNeKmTWeh7Aor/arcgis/rest/services/WORKER_Cambridge_Public_School_Maintenance_Requests/FeatureServer/0';
+const lyrUrl = 'https://services8.arcgis.com/uGiBf7iLew733Wn6/arcgis/rest/services/WORKER_Cambridge_Public_School_Maintenance_Requests/FeatureServer/0';
 const initSession = getExistingSession();
 
 function WorkerApp(){
