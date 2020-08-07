@@ -85,7 +85,12 @@
         --
       </div>
     </calcite-alert>
+
+    <!-- Local JS files -->
     <script src="/common.js"></script>
+    <script src="/text/common.js"></script>
+    <script src="/text/connect-ags-unpw.js"></script>
+
     <script>
 
       const SESSION_ID = '__ESRI_CONNECT_AGS_PATTERN__';
@@ -120,21 +125,11 @@
         }
       }
 
-      addToLog('Check for an existing session', `
-const prevSession = localStorage.getItem(SESSION_ID);
-if(prevSession !== null && prevSession !== "undefined"){
-  state.session = JSON.parse(prevSession);
-  state.session.expires = new Date(state.session.expires);
-  if(state.session.expires <= new Date()){
-    state.session = null;
-    localStorage.removeItem(SESSION_ID);
-  } else {
-    onAuthenticated(state.session);
-  }
-}
-console.log(state.session);
-/*${JSON.stringify(state.session, null, 2)}*/
-`)
+      const log = {
+        ...CHECK_SESSION,
+        codeText: results('state.session', state.session)`${CHECK_SESSION.codeText}`
+      };
+      addToLog(log);
 
       // log the user in when they click log in
       const form = document.querySelector("#login-form").onsubmit = async function(){    

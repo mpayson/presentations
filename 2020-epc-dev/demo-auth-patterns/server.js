@@ -50,9 +50,11 @@ app.use(
 const memoryUserStore = require('./models/memory-userstore');
 const trustAgsServerRouter = require('./routes/trust-ags-server');
 const trustAgsClientRouter = require('./routes/trust-ags-client');
+const useAgsServerRoute = require('./routes/use-ags-server');
 const connectRouter = require('./routes/connect-ags-unpw');
 app.use('/trust-ags-server', trustAgsServerRouter(memoryUserStore));
 app.use('/trust-ags-client', trustAgsClientRouter(memoryUserStore));
+app.use('/use-ags-server', useAgsServerRoute);
 app.use('/connect', connectRouter(memoryUserStore));
 
 // web-client is outside the server directory so it's easier to compare

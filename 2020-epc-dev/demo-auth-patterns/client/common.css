@@ -56,7 +56,7 @@ hr{
 }
 
 #panel {
-  width: 250px;
+  width: 264px;
   max-height: calc(100vh - 70px);
   padding: 0px 15px 15px 15px;
 
@@ -65,7 +65,8 @@ hr{
   left: 15px;
 
   box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 16px 0px;
-  background-color: var(--calcite-ui-foreground);
+  background: white;
+  /* background-color: var(--calcite-ui-foreground); */
 }
 
 /* take up the whole screen */
@@ -87,7 +88,7 @@ hr{
   max-height: 350px;
 
   position: absolute;
-  top: 10vh;
+  top: 25vh;
   left: calc(50% - 190px);
 
   padding: 0px 15px 15px 15px;
@@ -115,4 +116,13 @@ hr{
   margin: 15px 0px 5px 0px;
 }
 
+.mt-l{
+  margin-top: 20px;
+}
+.mt-s{
+  margin-top: 10px;
+}
 
+.hidden{
+  display: none;
+}

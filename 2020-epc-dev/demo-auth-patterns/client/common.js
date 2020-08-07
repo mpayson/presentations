@@ -48,7 +48,11 @@ function createCardForItem(item, onClick){
   return container;
 }
 
-function addToLog(title, codeText){
+/****************************************************
+   * Logging utils
+****************************************************/
+
+function addToLog({title, codeText}){
   const panel = document.querySelector('#side-panel');
   const header = createElementWithAttrs('div', {class: "h-margin-sm"});
   const codeContainer = createElementWithAttrs('div', {class: 'js-code'});
@@ -58,7 +62,7 @@ function addToLog(title, codeText){
   header.innerText = title;
   codeContainer.appendChild(pre);
   pre.appendChild(code);
-  code.innerText = codeText;
+  code.innerText = codeText.trim();
   panel.appendChild(header);
   panel.appendChild(codeContainer);
   document.querySelectorAll('pre code').forEach((block) => {
@@ -66,19 +70,39 @@ function addToLog(title, codeText){
   });
 }
 
+function results(name, data){
+  return function (strs, ...vars){
+    out = strs[0] + vars.map((v,i) => v + strs[i+1]).join('');
+    return `
+${out}
+console.log(${name});
+/*${JSON.stringify(data, null, 2)}*/
+`;
+  }
+}
+
+
 function appendRequestStep(title, url, addlParams, response){
-  const code = `const response = await fetch("${url}", ${JSON.stringify(addlParams, null, 2)});
+  const codeText = results('data', response)`
+const response = await fetch("${url}", ${JSON.stringify(addlParams, null, 2)});
 const data = await response.json();
-console.log(data);
-/*${JSON.stringify(response, null, 2)}*/
 `
-  addToLog(title, code);
+  addToLog({title, codeText});
 }
 
 
 /****************************************************
    * Network utils
 ****************************************************/
+
+// minimal utility to clean unwanted characters
+function cleanUrl(url) {
+  url = url.trim();
+  if (url[url.length - 1] === "/") {
+    url = url.slice(0, -1);
+  }
+  return url;
+}
 
 // generic handler for unknown errors
 // in this simple use case just directly update the UI on error
@@ -193,18 +217,7 @@ async function loadAGS(){
         }
         view.viewpoint = webmap.initialViewProperties.viewpoint;
 
-        addToLog('Switch the map', `# ArcGIS JS API classes
-const webmap = new WebMap({
-  portalItem: {id}
-});
-try{
-  view.map = webmap;
-  await webmap.when();
-} catch(e){
-  genericErrorHandler(e);
-}
-view.viewpoint = webmap.initialViewProperties.viewpoint;
-        `)
+        addToLog(SWITCH_MAP);
       }
 
       // set up ArcGIS by registering the token and building
@@ -238,25 +251,11 @@ view.viewpoint = webmap.initialViewProperties.viewpoint;
           itemContainerEl.appendChild(el);
         });
 
-
-        addToLog('Register a session and query portal for maps owned by user', `# ArcGIS JS API classes
-const portal = new Portal({
-  url: agsCredential.server,
-  authMode: 'anonymous'
-});
-esriId.registerToken(agsCredential);
-await portal.load();
-
-const qParams = new PortalQueryParams({
-  query: \`owner:"\${state.ags.userId}" AND type:"Web Map"\`,
-  sortField: 'modified',
-  sortOrder: 'desc',
-  num: 20
-});
-let qRes = await portal.queryItems(qParams);
-console.log(qRes.results.length);
-/*${qRes.results.length}*/
-        `)
+        const log = {
+          ...QUERY_PORTAL,
+          codeText: results('qRes.results.length', qRes.results.length)`${QUERY_PORTAL.codeText}`
+        }
+        addToLog(log)
       }
 
       // destroy ArcGIS by deleting the token and

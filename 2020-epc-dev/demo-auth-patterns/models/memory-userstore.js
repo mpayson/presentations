@@ -10,19 +10,20 @@ const { UserSession } = require("@esri/arcgis-rest-auth");
 let userStore = [{
   // username: "mpayson@esri.com",
   // password: "notsecure",
-  username: "mpayson@esri.com",
-  password: "a"
+  username: "mpayson@esri.com"
 }];
 
 // Validates a username and password from the user store
+// For demo, it doesn't actually do this, instead it accepts
+// any user name and stores if needed
 async function validateCredentials(username, password){
   const user = userStore.find(user => 
     user.username === username
   );
-  if(user && user.password === password){
-    return true
+  if(!user){
+    userStore.push({username: username})
   }
-  return false;
+  return true;
 }
 
 // Gets the user associated with an ArcGIS username and portal URL (should be unique)
@@ -54,19 +55,15 @@ async function getAGSSessionForUser(username){
   if(user && user.arcgis){
     let session = new UserSession(user.arcgis);
 
-    // For now, clear AGS session if refresh token expired
-    // In production, can run background task to have
-    // the refresh token refresh itself
-    if(session.refreshTokenExpires < new Date()){
-      joinAGSSession(username, null);
+    // For demo, just say the user is logged out
+    // In production, use the refresh token to get a new access token:
+    //    session = await session.refreshSession();
+    //    joinAGSSession(username, session);
+    // The refresh token can also refresh itself, and this can be monitored in the background
+    if(session.tokenExpires < new Date()){
       return undefined;
     }
 
-    // Refresh the access token if needed
-    if(session.tokenExpires < new Date()){
-      session = await session.refreshSession();
-      joinAGSSession(username, session);
-    }
     return session;
 
   }

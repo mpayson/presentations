@@ -7,6 +7,10 @@ function getJWTForRequest(req){
   return token;
 }
 
+const getRestUrlForPortal = portalUrl => {
+  return `${portalUrl}/sharing/rest`
+}
+
 // a modified authorize function from arcgis-rest-js to support passing in custom state
 // https://github.com/Esri/arcgis-rest-js/blob/25778e3e6b16d73cc22a79a7b9bc1c97f4f90ac4/packages/arcgis-rest-auth/src/UserSession.ts#L450
 function authorizeWithState(options, response){
@@ -26,5 +30,6 @@ function authorizeWithState(options, response){
 
 module.exports = {
   authorizeWithState,
-  getJWTForRequest
+  getJWTForRequest,
+  getRestUrlForPortal
 }

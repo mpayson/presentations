@@ -8,14 +8,14 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { isAuthorizedJWT } = require("../middleware/is-authorized");
 const { UserSession } = require("@esri/arcgis-rest-auth");
-const { authorizeWithState, getJWTForRequest } = require("../utils/utils")
+const { authorizeWithState, getJWTForRequest } = require("../utils/utils");
 
 // load and setup config variables from .env file
 const { CLIENT_ID, CONNECT_REDIRECT_URI, SESSION_SECRET } = process.env;
 
 // make TTLs short for demo purposes
-const TOKEN_EXPIRATION_MINUTES = 5;
-const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300;
+const JWT_EXPIRATION_MINUTES = 5;
+const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300; // 5 minutes
 
 // Expects a userstore method to validate credentials
 // and join ArcGIS session data
@@ -34,8 +34,10 @@ module.exports = function (userStore){
         message: 'Invalid credentials, either the username or password is incorrect'
       });
     }
-  
-    const expires = Date.now() + (TOKEN_EXPIRATION_MINUTES * 60 * 1000);
+    
+
+    // TODO switch back to sessions vs JWTs?
+    const expires = Date.now() + (JWT_EXPIRATION_MINUTES * 60 * 1000);
     const token = jwt.sign({
       exp: Math.floor(expires / 1000),
       sub: username

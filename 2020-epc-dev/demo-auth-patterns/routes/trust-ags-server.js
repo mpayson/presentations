@@ -5,6 +5,7 @@
 ****************************************************/
 const express = require('express');
 const router = express.Router();
+const { authorizeWithState, getRestUrlForPortal } = require("../utils/utils");
 
 const { isAuthorizedSession } = require("../middleware/is-authorized");
 const { UserSession } = require("@esri/arcgis-rest-auth");
@@ -13,8 +14,12 @@ const { UserSession } = require("@esri/arcgis-rest-auth");
 const { CLIENT_ID, REDIRECT_URI } = process.env;
 
 // make TTLs short for demo purposes
-const TOKEN_EXPIRATION_MS = 7200000;
-const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300;
+const COOKIE_EXPIRATION_MS = 7200000; // 2 hours
+const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300; // 5 minutes
+
+const ClientByPortal = {
+  'https://partners-dev.bd.esri.com/portal': 'OMBnSvuZcnODnHpb'
+}
 
 module.exports = function(userStore){
 
@@ -25,37 +30,44 @@ module.exports = function(userStore){
 
   // initiate user authorization, redirects user to ArcGIS to log in
   router.get("/authorize", function(req, res) {
-    UserSession.authorize({
-      clientId: CLIENT_ID,
+    const portal = req.query.portal ||  "https://www.arcgis.com";
+    const clientRedirect = req.query.redirect || "/trust-ags-server.html";
+    const clientId = ClientByPortal[portal] || CLIENT_ID;
+    const state = encodeURIComponent(JSON.stringify({portal, clientRedirect}));
+
+    authorizeWithState({
+      clientId,
       redirectUri: REDIRECT_URI,
-      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS / 60
+      duration: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS / 60,
+      portal: getRestUrlForPortal(portal),
+      state
     }, res);
+
   });
 
   // exchange code for the tokens, check if user exists, and store in session
   router.get("/redirect", async function(req, res) {
+    
+    const { portal, clientRedirect } = JSON.parse(decodeURIComponent(req.query.state));
+    const clientId = ClientByPortal[portal] || CLIENT_ID;
+
     const userSession = await UserSession.exchangeAuthorizationCode({
-      clientId: CLIENT_ID,
+      clientId,
       redirectUri: REDIRECT_URI,
-      refreshTokenTTL: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS
+      refreshTokenTTL: AGS_REFRESH_TOKEN_EXPIRATION_SECONDS,
+      portal: getRestUrlForPortal(portal)
     }, req.query.code);
 
-    // validate that the user exists, could add additional validation
-    const user = await getUserForAGSUser(userSession.username, userSession.portal);
-    
-    // if user exists, create authorized session
-    if(user && user.username){
-      // store the session
-      req.session.user = userSession.username;
-      req.session.agsSession = userSession.serialize();
-      return res.redirect('/trust-ags-server.html');
-    }
+    // For demo, the user isn't validated in this system, just in ArcGIS
+    // but this could be implemented with something like
+    //   const user = await getUserForAGSUser(userSession.username, userSession.portal);
+    //   validateUser(user);
 
-    // if user does not exist, return error
-    return res.status(403).json({
-      status: 403,
-      message: 'ArcGIS user does not have access to service'
-    });
+    req.session.user = userSession.username;
+    req.session.agsSession = userSession.serialize();
+
+    // redirect to the home html page
+    return res.redirect(clientRedirect);
 
   });
 
@@ -78,10 +90,15 @@ module.exports = function(userStore){
   // log the user out of the service
   router.post('/logout', isAuthorizedSession, function(req, res){
     req.session.destroy(function(err){
-      res.cookie("extend-arcgis-demo", { maxAge: TOKEN_EXPIRATION_MS });
+      res.cookie("extend-arcgis-demo", { maxAge: COOKIE_EXPIRATION_MS });
       return res.json({"message": "success!"});
     });
   });
+
+  router.get('/validate-portal', function(req, res){
+    const portal = req.query.portal;
+    return res.json({"isValid": !!ClientByPortal[portal]});
+  })
 
   return router;
 }

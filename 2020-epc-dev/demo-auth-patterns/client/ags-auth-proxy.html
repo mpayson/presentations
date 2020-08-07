@@ -58,7 +58,12 @@
         --
       </div>
     </calcite-alert>
+
+    <!-- Local JS files -->
     <script src="/common.js"></script>
+    <script src="/text/common.js"></script>
+    <script src="/text/ags-auth-proxy.js"></script>
+
     <script>
 
     require([
@@ -91,11 +96,7 @@
         url: "https://utility.arcgis.com/usrsvcs/appservices/pC7z6n7wpgd8gy2o/rest/services/World/Route/NAServer/Route_World/solve"
       });
 
-      addToLog('Create route task with proxy URL', `
-const routeTask = new RouteTask({
-  url: "https://utility.arcgis.com/usrsvcs/appservices/vIJFA5sW8T6sRDt4/rest/services/World/Route/NAServer/Route_World/solve"
-});
-`)
+      addToLog(CREATE_TASK);
 
       // creat the start (Esri HQ) and stop (favorite burrito place)
       const start = new Point({
@@ -143,22 +144,7 @@ const routeTask = new RouteTask({
         };
         view.graphics.add(routeResult);
         
-        addToLog('Generate a route', `
-const routeParams = new RouteParameters({
-  stops: new FeatureSet({
-    features: [startGraphic, stopGraphic]
-  })
-});
-
-data = await routeTask.solve(routeParams);
-const routeResult = data.routeResults[0].route;
-routeResult.symbol = {
-  type: "simple-line",
-  color: [0, 0, 255, 0.5],
-  width: 5
-};
-view.graphics.add(routeResult);
-`)
+        addToLog(GENERATE_ROUTE)
 
       }
 

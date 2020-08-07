@@ -75,7 +75,12 @@
         --
       </div>
     </calcite-alert>
+
+    <!-- Local JS files -->
     <script src="/common.js"></script>
+    <script src="/text/common.js"></script>
+    <script src="/text/trust-ags-client.js"></script>
+
     <script>
 
       const SESSION_ID = '__ESRI_TRUST_AGS_CLIENT_PATTERN__';
@@ -108,21 +113,10 @@
         }
       }
 
-      addToLog('Check for an existing session', `
-const serializedSession = localStorage.getItem(SESSION_ID);
-if(serializedSession !== null && serializedSession !== "undefined"){
-  let {session, ags} = JSON.parse(serializedSession);
-  session.expires = new Date(session.expires);
-  if(session.expires > new Date()){
-    state = {session, ags};
-    onAuthenticated();
-  } else {
-    localStorage.removeItem(SESSION_ID);
-  }
-}
-console.log(state.session);
-/*${JSON.stringify(state, null, 2)}*/
-`)
+      addToLog({
+        ...CHECK_SESSION,
+        codeText: results('state.session', state.session)`${CHECK_SESSION.codeText}`
+      });
 
       // handle oauth callback if there's a state parameter in the URL
       // note this is normally a standalone script on another HTML page
@@ -160,7 +154,7 @@ console.log(state.session);
         state = {
           session,
           ags: agsCredential
-        }
+        };
         onAuthenticated();
       }
 
@@ -184,12 +178,12 @@ console.log(state.session);
         logInEl.style.display = 'block';
         localStorage.removeItem(SESSION_ID);
         state = {};
-        addToLog('Log the user out', `
-localStorage.removeItem(SESSION_ID);
-state = {};
-console.log(state);
-/*${JSON.stringify(state, null, 2)}*/
-`)
+        
+        addToLog({
+          ...LOG_OUT,
+          codeText: results('state', state)`${LOG_OUT.codeText}`
+        });
+
       });
 
       // load ArcGIS / maps and get resulting interfaces

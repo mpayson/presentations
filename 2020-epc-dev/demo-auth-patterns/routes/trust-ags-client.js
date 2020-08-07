@@ -15,6 +15,9 @@ const { SESSION_SECRET } = process.env;
 
 module.exports = function(userStore){
 
+  // not currently used, but could be used to interact with user store
+  // eg to validate that user should access the app before setting a session
+  // or to get additional information from the store about the user
   const { getUserForAGSUser } = userStore;
 
   // exchanges an ArcGIS credential for a custom API JWT
@@ -46,29 +49,22 @@ module.exports = function(userStore){
       });
     }
 
-    // validate that the user exists, could add additional validation
-    const user = await getUserForAGSUser(userId, server);
+    // For demo, the user isn't validated in this system, just in ArcGIS
+    // but this could be implemented with something like
+    //   const user = await getUserForAGSUser(userId, server);
+    //   validateUser(user);
 
-    // if the user exists, return access token
-    if(user && user.username){
-      // create and return the JWT
-      const jwtToken = jwt.sign({
-        exp: Math.floor(session.tokenExpires / 1000), // sync expirations
-        sub: user.username
-      }, SESSION_SECRET);
+    // create and return the JWT
+    const jwtToken = jwt.sign({
+      exp: Math.floor(session.tokenExpires / 1000), // sync expirations
+      sub: userId,
+    }, SESSION_SECRET);
 
-      return res.json({
-        token: jwtToken,
-        user: user.username,
-        expires: session.tokenExpires
-      })
-    }
-
-    // if user does not exist, return error
-    return res.status(403).json({
-      status: 403,
-      message: 'ArcGIS user does not have access to service'
-    });
+    return res.json({
+      token: jwtToken,
+      user: userId,
+      expires: session.tokenExpires
+    })
 
   })
 

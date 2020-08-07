@@ -8,14 +8,6 @@
     />
     <title>Use ArcGIS - Client</title>
 
-    <script>
-      var dojoConfig = {
-        has: {
-          "esri-native-promise": true
-        }
-      };
-    </script>
-
     <!-- Calcite Components -->
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.css" />
     <script type="module" src="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.esm.js"></script>
@@ -67,7 +59,15 @@
     <div id="login-window">
       <div id="login-form">
         <h1>Welcome!</h1>
-        <calcite-button width="full" class="mt-s" scale="l" id="login">Sign in with ArcGIS Online</calcite-button>
+        <calcite-button width="full" class="mt-s" scale="l" id="login-online">Sign in with ArcGIS Online</calcite-button>
+        <calcite-button width="full" class="mt-l" appearance="outline" scale="l" id="enterprise-btn">Sign in with ArcGIS Enterprise</calcite-button> 
+        <calcite-label class="mt-s hidden" id="enterprise-container">
+          ArcGIS Enterprise URL
+          <calcite-input placeholder="https://<server>/portal" id="enterprise-url">
+            <calcite-button width="full" slot="input-action" id="login-enterprise">Go</calcite-button>
+          </calcite-input>
+          <calcite-input-message icon id="enterprise-message">Unknown Portal URL</calcite-input-message>
+        </calcite-label>
       </div>
     </div>
 
@@ -101,56 +101,52 @@
          * Custom authentication logic
       ****************************************************/
 
-      // check if the user has already logged in
-      const serializedSession = localStorage.getItem(SESSION_ID);
-      if(serializedSession !== null && serializedSession !== "undefined"){
-        let parsed = JSON.parse(serializedSession);
-        parsed.expires = new Date(parsed.expires);
-        if(parsed.expires > new Date()){
-          state = {ags: parsed};
-          onAuthenticated();
+      async function init(){
+        let agsCredential;
+        try {
+          state = {
+            ags: await get('/use-ags-server/ags-credential', null, 'Get token / checked if logged in (normally done with redirect)', false)
+          }
+        } catch(e){
+          if(e.status !== 401) genericErrorHandler(e);
+          return;
+        }
+        onAuthenticated();
+      }
+      init();
+
+      function initOAuth(portal){
+        window.location.href = `/use-ags-server/authorize?redirect=${encodeURIComponent(window.location.href)}`
+          + (portal ? `&portal=${encodeURIComponent(portal)}` : '');
+      }
+
+      // toggle URL input when logging in with Enterprise 
+      const labelEl = document.querySelector("#enterprise-container");
+      document.querySelector("#enterprise-btn").onclick = function(){
+        labelEl.classList.remove("hidden");
+      }
+
+      // validate URL and kick off OAuth 2.0 for Enterprise
+      const urlEl = document.querySelector("#enterprise-url");
+      const messageEl = document.querySelector("#enterprise-message");
+      document.querySelector("#login-enterprise").onclick = async function(){
+        const portalUrl = cleanUrl(urlEl.value);
+        const { isValid } = await get(`/use-ags-server/validate-portal?portal=${encodeURIComponent(portalUrl)}`);
+        if(!isValid){
+          labelEl.status = "invalid";
+          messageEl.active = true;
+          messageEl.status = "invalid";
         } else {
-          localStorage.removeItem(SESSION_ID);
+          initOAuth(portalUrl);
         }
       }
 
-      addToLog({
-        ...CHECK_SESSION,
-        codeText: results('state', state)`${CHECK_SESSION.codeText}`
-      })
-
-      // handle oauth callback if there's a state parameter in the URL
-      // note this is normally a standalone script on another HTML page
-      // but I wanted to keep the demos to one HTML page
-      // get client id from url hash
-      const match = window.location.href.match(/&state=([^&]+)/);
-      if(match){
-        arcgisRest.UserSession.completeOAuth2({
-          clientId: CLIENT_ID,
-          popup: true
-        });
+      document.querySelector("#login-online").onclick = function(){
+        initOAuth(null);
       }
 
       // handle on login click, redirect here since handle login per above
       // use a popup so can track what is happening
-      document.querySelector("#login").onclick = async function(){
-        addToLog(START_OAUTH);
-        const session = await arcgisRest.UserSession.beginOAuth2({
-          clientId: CLIENT_ID,
-          redirectUri: `${window.location.href}`,
-          popup: true
-        });
-        const credential = session.toCredential();
-        localStorage.setItem(SESSION_ID, JSON.stringify(credential));
-        state = {ags: credential};
-
-        addToLog({
-          ...COMPLETE_OAUTH,
-          codeText: results('state', state)`${COMPLETE_OAUTH.codeText}`
-        });
-        onAuthenticated();
-      }
-
       async function onAuthenticated(){
         const username = state.ags.userId;
         unDisplayEl.textContent = username;
@@ -161,13 +157,13 @@
       document.querySelector('#logout').addEventListener('click', async function(){
         unDisplayEl.textContent = '--';
         logInEl.style.display = 'block';
-        localStorage.removeItem(SESSION_ID);
         state = {};
-        addToLog({
-          ...LOG_OUT,
-          codeText: results('state', state)`${LOG_OUT.codeText}`
-        })
+        await post('/use-ags-server/logout', null, null, 'Log the user out');
       });
+
+      /****************************************************
+         * App logic
+      ****************************************************/
 
       // load ArcGIS / maps and get resulting interfaces
       let setupAGS, destroyAGS, esriId;
