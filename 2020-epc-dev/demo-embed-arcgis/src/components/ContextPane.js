@@ -57,7 +57,7 @@ function ContextPane(){
       </ContextCard>
       <ContextCard bar={infrActive ? 'white' : null}>
         <CardContent>
-        <ContextTitle active={infrActive}>Infrastructure</ContextTitle>
+        <ContextTitle active={infrActive}>Identity</ContextTitle>
           <ContextP active={infrActive}>
             Hosted feature services & views<br/>
             Basic User Types<br/>
