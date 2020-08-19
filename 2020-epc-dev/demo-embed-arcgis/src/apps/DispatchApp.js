@@ -7,8 +7,6 @@ import { signIn, signOut, getExistingSession, registerSession } from '../service
 import { getLayerFromUrl, addEditWidget } from '../services/MapService';
 import { assigneeRenderer, needsMaintDefExp, statusPopupTemplate } from '../config/constants';
 import AppNav from '../components/AppNav';
-import {UserName} from '../components/ContextPane';
-import {Password} from '../components/ContextPane';
 
 const Container = styled(CenteredContainer)`
   text-align: center;
@@ -77,8 +75,8 @@ function UserDispatchApp(){
             <h2>Dispatch app!</h2>
             <p>Assign maintenance requests to workers</p>
             <Button half onClick={onLogin}>Log in</Button><br/><br/>
-            {UserName}<br/>
-            {Password}
+            User Name: embed_dispatch<br/>
+            Password: Esri1234!
           </Container>
         </MapMask>
       }

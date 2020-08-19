@@ -8,8 +8,6 @@ import { MapDiv, CenteredContainer, MapMask } from '../components/Common';
 import AppNav from '../components/AppNav';
 import { signOut, signIn, getExistingSession, registerSession } from '../services/AuthService';
 import styled from 'styled-components';
-import {UserName} from '../components/ContextPane';
-import {Password} from '../components/ContextPane';
 
 const Container = styled(CenteredContainer)`
   text-align: center;
@@ -69,8 +67,8 @@ function WorkerApp(){
             <h2>Worker app!</h2>
             <p>Route to maintenance request assignments</p>
             <Button half onClick={onLogin}>Log in</Button><br/><br/>
-            {UserName}<br/>
-            {Password}
+            User Name: embed_worker<br/>
+            Password: Esri1234!
           </Container>
         </MapMask>
       }
