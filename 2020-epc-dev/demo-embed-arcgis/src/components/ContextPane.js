@@ -12,8 +12,9 @@ import {Pntm} from '../components/Common';
 
 var UserName = "";
 var Password = "";
-var UserNameAdv = "";
-var PasswordAdv = "";
+
+export {UserName};
+export {Password};
 
 const H = styled.h2`
   font-weight: lighter;
@@ -35,28 +36,16 @@ const ContextP = styled(Pntm)`
 function DispatchLogin(){
   UserName = "User Name: embed_dispatch";
   Password = "Password: Esri1234!";
-  UserNameAdv = "";
-  PasswordAdv = ""
 }
 
 function WorkerLogin(){
   UserName = "User Name: embed_worker";
   Password = "Password: Esri1234!";
-  UserNameAdv = "";
-  PasswordAdv = ""
 }
 
-function WorkerLoginAdv(){
-  UserNameAdv = "User Name: embed_worker";
-  PasswordAdv = "Password: Esri1234!";
-  UserName = "";
-  Password = ""
-}
 function ClearLogin(){
   UserName = "";
   Password = "";
-  UserNameAdv = "";
-  PasswordAdv = ""
 }
 
 function ContextPane(){
@@ -92,8 +81,6 @@ function ContextPane(){
           <ContextP active={infrActive}>
             Hosted feature services & views<br/>
             User Types<br/>
-            {UserName}<br/>
-            {Password}
           </ContextP>
           <ButtonGroup>
             <Button clearWhite={path !== '/user/request'} white={path === '/user/request'} fullWidth onClick={_ => {ClearLogin(); history.push('/user/request')}}>Form</Button>
@@ -107,12 +94,10 @@ function ContextPane(){
         <ContextTitle active={advActive}>Advanced capabilities</ContextTitle>
           <ContextP active={advActive}>
             GeoEvent processors<br/>
-            {UserNameAdv}<br/>
-            {PasswordAdv}
           </ContextP>
           <ButtonGroup>
             <Button clearWhite={path !== '/realtime/request'} white={path === '/realtime/request'} fullWidth onClick={_ => {ClearLogin(); history.push('/realtime/request')}}>Form</Button>
-            <Button clearWhite={path !== '/realtime/worker'} white={path === '/realtime/worker'} fullWidth onClick={_ => {WorkerLoginAdv(); history.push('/realtime/worker')}}>Worker</Button>
+            <Button clearWhite={path !== '/realtime/worker'} white={path === '/realtime/worker'} fullWidth onClick={_ => {WorkerLogin(); history.push('/realtime/worker')}}>Worker</Button>
           </ButtonGroup>
         </CardContent>
       </ContextCard>
