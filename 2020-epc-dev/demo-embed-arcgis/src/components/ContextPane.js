@@ -60,7 +60,7 @@ function ContextPane(){
         <ContextTitle active={infrActive}>Identity</ContextTitle>
           <ContextP active={infrActive}>
             Hosted feature services & views<br/>
-            Basic User Types<br/>
+            User Types<br/>
           </ContextP>
           <ButtonGroup>
             <Button clearWhite={path !== '/user/request'} white={path === '/user/request'} fullWidth onClick={_ => history.push('/user/request')}>Form</Button>

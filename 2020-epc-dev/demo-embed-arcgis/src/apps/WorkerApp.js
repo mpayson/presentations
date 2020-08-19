@@ -66,7 +66,9 @@ function WorkerApp(){
           <Container>
             <h2>Worker app!</h2>
             <p>Route to maintenance request assignments</p>
-            <Button half onClick={onLogin}>Log in</Button>
+            <Button half onClick={onLogin}>Log in</Button><br/><br/>
+            User Name: embed_worker<br/>
+            Password: Esri1234!
           </Container>
         </MapMask>
       }

@@ -74,7 +74,9 @@ function UserDispatchApp(){
           <Container>
             <h2>Dispatch app!</h2>
             <p>Assign maintenance requests to workers</p>
-            <Button half onClick={onLogin}>Log in</Button>
+            <Button half onClick={onLogin}>Log in</Button><br/><br/>
+            User Name: embed_dispatch<br/>
+            Password: Esri1234!
           </Container>
         </MapMask>
       }
