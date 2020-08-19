@@ -15,6 +15,7 @@ export async function signIn(){
 
   const session = await UserSession.beginOAuth2({
     clientId,
+    portal: 'https://epndemo.maps.arcgis.com/sharing/rest',
     popup: true,
     redirectUri: `${window.location.origin}/redirect.html`
   });
