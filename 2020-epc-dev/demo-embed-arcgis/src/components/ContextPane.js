@@ -10,6 +10,11 @@ import Card, {
 } from 'calcite-react/Card';
 import {Pntm} from '../components/Common';
 
+var UserName = "";
+var Password = "";
+var UserNameAdv = "";
+var PasswordAdv = "";
+
 const H = styled.h2`
   font-weight: lighter;
   color: #ccc;
@@ -27,6 +32,32 @@ const ContextP = styled(Pntm)`
   color: ${props => props.active ?  'white' : 'rgba(169,169,169,0.3)'};
   font-weight: ${props => props.active ?  'bold' : 'lighter'};
 `
+function DispatchLogin(){
+  UserName = "User Name: embed_dispatch";
+  Password = "Password: Esri1234!";
+  UserNameAdv = "";
+  PasswordAdv = ""
+}
+
+function WorkerLogin(){
+  UserName = "User Name: embed_worker";
+  Password = "Password: Esri1234!";
+  UserNameAdv = "";
+  PasswordAdv = ""
+}
+
+function WorkerLoginAdv(){
+  UserNameAdv = "User Name: embed_worker";
+  PasswordAdv = "Password: Esri1234!";
+  UserName = "";
+  Password = ""
+}
+function ClearLogin(){
+  UserName = "";
+  Password = "";
+  UserNameAdv = "";
+  PasswordAdv = ""
+}
 
 function ContextPane(){
 
@@ -52,20 +83,22 @@ function ContextPane(){
             Routing service<br/>
             ArcGIS API for JavaScript<br/>
           </ContextP>
-          <Button clearWhite onClick={_ => history.push('/lbs')}>LBS app</Button>
+          <Button clearWhite onClick={_ => {ClearLogin(); history.push('/lbs')}}>LBS app</Button>
         </CardContent>
       </ContextCard>
       <ContextCard bar={infrActive ? 'white' : null}>
         <CardContent>
-        <ContextTitle active={infrActive}>Infrastructure</ContextTitle>
+        <ContextTitle active={infrActive}>Identity</ContextTitle>
           <ContextP active={infrActive}>
             Hosted feature services & views<br/>
-            Basic User Types<br/>
+            User Types<br/>
+            {UserName}<br/>
+            {Password}
           </ContextP>
           <ButtonGroup>
-            <Button clearWhite={path !== '/user/request'} white={path === '/user/request'} fullWidth onClick={_ => history.push('/user/request')}>Form</Button>
-            <Button clearWhite={path !== '/user/dispatch'} white={path === '/user/dispatch'} fullWidth onClick={_ => history.push('/user/dispatch')}>Dispatch</Button>
-            <Button clearWhite={path !== '/user/worker'} white={path === '/user/worker'} fullWidth onClick={_ => history.push('/user/worker')}>Worker</Button>
+            <Button clearWhite={path !== '/user/request'} white={path === '/user/request'} fullWidth onClick={_ => {ClearLogin(); history.push('/user/request')}}>Form</Button>
+            <Button clearWhite={path !== '/user/dispatch'} white={path === '/user/dispatch'} fullWidth onClick={_ => {DispatchLogin(); history.push('/user/dispatch')}}>Dispatch</Button>
+            <Button clearWhite={path !== '/user/worker'} white={path === '/user/worker'} fullWidth onClick={_ => {WorkerLogin(); history.push('/user/worker')}}>Worker</Button>
           </ButtonGroup>
         </CardContent>
       </ContextCard>
@@ -74,10 +107,12 @@ function ContextPane(){
         <ContextTitle active={advActive}>Advanced capabilities</ContextTitle>
           <ContextP active={advActive}>
             GeoEvent processors<br/>
+            {UserNameAdv}<br/>
+            {PasswordAdv}
           </ContextP>
           <ButtonGroup>
-            <Button clearWhite={path !== '/realtime/request'} white={path === '/realtime/request'} fullWidth onClick={_ => history.push('/realtime/request')}>Form</Button>
-            <Button clearWhite={path !== '/realtime/worker'} white={path === '/realtime/worker'} fullWidth onClick={_ => history.push('/realtime/worker')}>Worker</Button>
+            <Button clearWhite={path !== '/realtime/request'} white={path === '/realtime/request'} fullWidth onClick={_ => {ClearLogin(); history.push('/realtime/request')}}>Form</Button>
+            <Button clearWhite={path !== '/realtime/worker'} white={path === '/realtime/worker'} fullWidth onClick={_ => {WorkerLoginAdv(); history.push('/realtime/worker')}}>Worker</Button>
           </ButtonGroup>
         </CardContent>
       </ContextCard>
