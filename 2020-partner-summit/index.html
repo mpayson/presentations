@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="initial-scale=1,maximum-scale=1,user-scalable=no"
+  />
+  <title>Solution.js Demo</title>
+
+  <!-- Calcite Components -->
+  <link rel="stylesheet" type="text/css" href="node_modules/@esri/calcite-components/dist/calcite/calcite.css" />
+  <script type="module" src="node_modules/@esri/calcite-components/dist/calcite/calcite.esm.js"></script>
+
+  <!-- arcgis-rest-js -->
+  <script src="node_modules/@esri/arcgis-rest-request/dist/umd/request.umd.min.js"></script>
+  <script src="node_modules/@esri/arcgis-rest-auth/dist/umd/auth.umd.min.js"></script>
+  <script src="node_modules/@esri/arcgis-rest-feature-layer/dist/umd/feature-layer.umd.min.js"></script>
+  <script src="node_modules/@esri/arcgis-rest-portal/dist/umd/portal.umd.min.js"></script>
+  <script src="node_modules/@esri/arcgis-rest-service-admin/dist/umd/service-admin.umd.min.js"></script>
+
+  <!-- hub-js -->
+  <script src="node_modules/@esri/hub-common/dist/umd/common.umd.min.js"></script>
+  <script src="node_modules/@esri/hub-initiatives/dist/umd/initiatives.umd.min.js"></script>
+  <script src="node_modules/@esri/hub-sites/dist/umd/sites.umd.min.js"></script>
+  <script src="node_modules/@esri/solution-hub-types/dist/umd/hub-types.umd.min.js"></script>
+  
+  <!-- solution-js -->
+  <script src="node_modules/@esri/solution-common/dist/umd/common.umd.js"></script>
+  <script src="node_modules/@esri/solution-feature-layer/dist/umd/feature-layer.umd.js"></script>
+  <script src="node_modules/@esri/solution-file/dist/umd/file.umd.js"></script>
+  <script src="node_modules/@esri/solution-form/dist/umd/form.umd.js"></script>
+  <script src="node_modules/@esri/solution-group/dist/umd/group.umd.js"></script>
+  <script src="node_modules/@esri/solution-storymap/dist/umd/storymap.umd.js"></script>
+  <script src="node_modules/@esri/solution-web-experience/dist/umd/web-experience.umd.min.js"></script>
+  <script src="node_modules/@esri/solution-simple-types/dist/umd/simple-types.umd.js"></script>
+  <script src="node_modules/@esri/solution-creator/dist/umd/creator.umd.js"></script>
+  <script src="node_modules/@esri/solution-deployer/dist/umd/deployer.umd.js"></script>
+
+  <!-- local styles -->
+  <link rel="stylesheet" type="text/css" href="index.css" />
+
+</head>
+<body>
+  <div id="container">
+    <h1>Solution.js Demo</h1>
+    <br/>
+    <calcite-stepper icon numbered id="stepper" scale="l">
+      <calcite-stepper-item item-title="Adminster" item-subtitle="Create a solution template within your organization" complete>
+      </calcite-stepper-item>
+      <calcite-stepper-item id="stepper-deploy" item-title="Deploy" item-subtitle="Deploy the template to your user's organization!">
+      </calcite-stepper-item>
+    </calcite-stepper>
+    <div id="admin">
+      <h2 id="admin-account">Administration account:&nbsp;
+        <calcite-link id="admin-login" href="" color="blue" icon-end="signIn">
+          Sign In
+        </calcite-link>
+      </h2>
+      <calcite-label scale="m">
+        <!-- value="874f8e2582f346248c06ccaf6994448b"  -->
+        <calcite-input id="group-id" placeholder="f41da4a7cd994ad3914d3f3b73ce58e4" prefix-text="Group ID:">
+          <calcite-button id="create" slot="input-action" appearance="outline">Go</calcite-button>
+        </calcite-input>
+        <calcite-input-message icon id="admin-er-message"></calcite-input-message>
+      </calcite-label>
+    </div>
+    <div id="user" class="hidden">
+      <h2 id="user-account">User account:&nbsp;
+        <calcite-link id="user-login" href="" color="blue" icon-end="signIn">
+          Sign In
+        </calcite-link>
+      </h2>
+      <calcite-label scale="m">
+        <calcite-input id="template-id" placeholder="f41da4a7cd994ad3914d3f3b73ce58e4" prefix-text="Template ID:">
+          <calcite-button id="deploy" slot="input-action" appearance="outline">Go</calcite-button>
+        </calcite-input>
+        <calcite-input-message icon id="user-er-message"></calcite-input-message>
+      </calcite-label>
+    </div>
+    <calcite-progress id="progress" class="hidden" text="50%"></calcite-progress>
+    <div style="width:100%; text-align: center;">
+      <calcite-button id="result" scale="l" icon-start="launch" target="__blank" class="hidden">Check it out!</calcite-button>
+    </div>
+  </div>
+
+  <script>
+      
+    const CLIENT_ID = 'wqxf4JBvtmeyB18v';
+    const SESSION_ID = 'solutionjs_demo';
+    let state = {};
+
+    function getRootPortal(portal){
+      return `${portal.urlKey}.${portal.customBaseUrl}`;
+    }
+
+    /****************************************************
+      * Auth logic
+    ****************************************************/
+
+    // handle oauth callback if there's a state parameter in the URL
+    // note this is normally a standalone script on another HTML page
+    // but I wanted to keep the demos to one HTML page
+    // get client id from url hash
+    const match = window.location.href.match(/&state=([^&]+)/);
+    if(match){
+      arcgisRest.UserSession.completeOAuth2({
+        clientId: CLIENT_ID,
+        popup: true
+      });
+    }
+
+    // handle on login click, redirect here since handle login per above
+    // use a popup so can track what is happening
+    async function logIn(){
+      return arcgisRest.UserSession.beginOAuth2({
+        clientId: CLIENT_ID,
+        redirectUri: `${window.location.href}`,
+        popup: true
+      });
+    }
+
+    // configure things on log in
+    const adminEl = document.querySelector("#admin-account");
+    const userEl = document.querySelector("#user-account");
+    async function onLogIn(step, session){
+      const portal = await arcgisRest.getPortal(null, {
+        authentication: session,
+        portal: session.portal
+      });
+      state[step] = {session, portal};
+      if(step === 'admin'){
+        adminEl.innerHTML = `Administration account:&nbsp;<span class="normal">${session.username} (${getRootPortal(portal)})</span>`;
+      } else {
+        userEl.innerHTML = `User account:&nbsp;<span class="normal">${session.username} (${getRootPortal(portal)})</span>`;
+      }
+      localStorage.setItem(`${SESSION_ID}_${step}`, JSON.stringify(session.toJSON()))
+    }
+
+    function handleExistingSession(step){
+      const serializedSession = localStorage.getItem(`${SESSION_ID}_${step}`);
+      if(serializedSession){
+        let jsonSession = JSON.parse(serializedSession);
+        jsonSession.tokenExpires = new Date(jsonSession.tokenExpires);
+        if(jsonSession.tokenExpires > new Date()){
+          const session = new arcgisRest.UserSession(jsonSession);
+          onLogIn(step, session);
+        } else {
+          localStorage.removeItem(`${SESSION_ID}_${step}`);
+        }
+      }
+    }
+    handleExistingSession('admin');
+    handleExistingSession('user');
+    
+    // log the user in when they select admin account
+    document.querySelector("#admin-login").onclick = async function(){
+      const session = await logIn();
+      onLogIn('admin', session);
+    }
+
+    // log the user in when they select user account
+    document.querySelector("#user-login").onclick = async function(){
+      const session = await logIn();
+      onLogIn('user', session);
+    }
+
+    /****************************************************
+      * UI logic
+    ****************************************************/
+
+    // update the progress element
+    const progressEl = document.querySelector("#progress");
+    function setProgress(percentProgress){
+      progressEl.classList.remove('hidden');
+      progressEl.value = percentProgress / 100;
+      progressEl.text = `${percentProgress}%`;
+    }
+
+    const resultEl = document.querySelector("#result");
+    function onResult(resultUrl){
+      console.log(resultUrl);
+      progressEl.classList.add('hidden');
+      resultEl.classList.remove('hidden');
+      state.result = resultUrl;
+    }
+    resultEl.onclick = function(){
+      if(!state.result) return;
+      window.open(state.result, "_blank");
+    }
+    
+    const stepperEl = document.querySelector("#stepper");
+    const adminContainerEl = document.querySelector("#admin");
+    const userContainerEl = document.querySelector("#user");
+    stepperEl.addEventListener('calciteStepperItemChange', function(e){
+      const position = e.detail.position;
+      state.result = null;
+      resultEl.classList.add('hidden');
+      if(position === 0){
+        userContainerEl.classList.add('hidden');
+        adminContainerEl.classList.remove('hidden');
+      } else {
+        userContainerEl.classList.remove('hidden');
+        adminContainerEl.classList.add('hidden');
+      }
+    });
+
+    /****************************************************
+      * Solution templating and deployment logic
+    ****************************************************/
+    const groupEl = document.querySelector("#group-id");
+    const templateEl = document.querySelector("#template-id");
+    const adminMessageEl = document.querySelector("#admin-er-message");
+    document.querySelector("#create").onclick = async function(){
+      resultEl.classList.add('hidden');
+      let result;
+      try {
+        result = await arcgisSolution.createSolution(groupEl.value, state.admin.session, {
+          progressCallback: setProgress
+        });
+      } catch(err){
+        adminMessageEl.active = true;
+        adminMessageEl.status = "invalid";
+        adminMessageEl.innerText = err.originalMessage || "Something went wrong - is this a valid item that the admin can access?";
+        return;
+      }
+      const resultUrl = `https://${getRootPortal(state.admin.portal)}/home/item.html?id=${result}`;
+      onResult(resultUrl);
+      templateEl.value = result;
+    }
+
+    const userMessageEl = document.querySelector("#user-er-message");
+    document.querySelector("#deploy").onclick = async function(){
+      resultEl.classList.add('hidden');
+      let result;
+      try {
+        result = await arcgisSolution.deploySolution(templateEl.value, state.user.session, {
+          progressCallback: setProgress,
+          storageAuthentication: state.admin.session
+        });
+      } catch(err){
+        userMessageEl.active = true;
+        userMessageEl.status = "invalid";
+        userMessageEl.innerText = err.originalMessage;
+        return;
+      }
+      const resultUrl = `https://${getRootPortal(state.user.portal)}/home/item.html?id=${result}`;
+      onResult(resultUrl);
+    }
+
+  </script>
+</body>
+

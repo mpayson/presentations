@@ -1,0 +1,46 @@
+/* take up the whole screen */
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  padding: 0px;
+  margin: 0px;
+  /* background: var(--calcite-ui-background); */
+  background: #d2e9f9;
+}
+
+#container{
+  width: 1000px;
+  height: 400px;
+  padding: 10px 50px 50px 50px;
+
+  position: absolute;
+  top: 20vh;
+  left: calc(50% - 550px);
+
+  /* box-shadow:  0px 0px 16px 0px; */
+  border: 1.5px solid var(--calcite-ui-border-1);
+
+  background: white;
+}
+
+.inline-header{
+  display: inline-block;
+  margin: 0px;
+}
+
+.h-margin-sm{
+  margin: 15px 0px 5px 0px;
+}
+
+.right{
+  float: right;
+}
+
+.hidden {
+  display: none;
+}
+
+.normal {
+  font-weight: normal;
+}
