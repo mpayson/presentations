@@ -2,7 +2,7 @@
 > A couple POC demos for validating users and accessing resources with ArcGIS
 
 ### ⚠ A disclaimer
-These are quick POCs inferred from patterns we've seen implemented. Please closely evaluate the approaches in the context of your security posture and do not take the implementations as hardened or authoritative references for your production systems. Thanks and if you have any feedback, [drop a note](mailto:mpayson@esri.com)!
+These are quick demos to showcase the user experience flows from patterns we've seen implemented. Please do not take the implementations as authoritative references for your production systems and closely evaluate any approaches in the context of your security posture. Thanks and if you have any feedback, [drop a note](mailto:mpayson@esri.com)!
 
 ## App Patterns
 > Access resources on behalf of the app
