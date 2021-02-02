@@ -13,8 +13,8 @@ These are quick demos to showcase the user experience flows from patterns we've 
 > Access resources on behalf of a user
 
 * **Just use ArcGIS** - use ArcGIS to host and secure the services needed for your solution. [server-based routes](/2020-epc-dev/demo-auth-patterns/routes/use-ags-server.js) | [server-based html](/2020-epc-dev/demo-auth-patterns/client/use-ags-server.html) | [client-based html](/2020-epc-dev/demo-auth-patterns/client/use-ags-client.html)
-* **Connect ArcGIS** - allow users to connect their ArcGIS account to your identity management system. [express routes](/2020-epc-dev/demo-auth-patterns/routes/connect-ags-unpw.js) | [html](/2020-epc-dev/demo-auth-patterns/client/connect-ags-unpw.html)]
-* **Trust ArcGIS** - write middleware to authenticate validated ArcGIS users in your identity management system. [server-based express routes](/2020-epc-dev/demo-auth-patterns/routes/trust-ags-server.js) | [server-based html](/2020-epc-dev/demo-auth-patterns/client/trust-ags-server.html) | [client-based express routes](/2020-epc-dev/demo-auth-patterns/routes/trust-ags-client.js) | [client-based html](/2020-epc-dev/demo-auth-patterns/client/trust-ags-client.html)]
+* **Connect ArcGIS** - allow users to connect their ArcGIS account to your identity management system. [express routes](/2020-epc-dev/demo-auth-patterns/routes/connect-ags-unpw.js) | [html](/2020-epc-dev/demo-auth-patterns/client/connect-ags-unpw.html)
+* **Trust ArcGIS** - write middleware to authenticate validated ArcGIS users in your identity management system. Learn more about the considerations under ["Access of a protected API as proof of authentication"](https://oauth.net/articles/authentication/)). [server-based express routes](/2020-epc-dev/demo-auth-patterns/routes/trust-ags-server.js) | [server-based html](/2020-epc-dev/demo-auth-patterns/client/trust-ags-server.html) | [client-based express routes](/2020-epc-dev/demo-auth-patterns/routes/trust-ags-client.js) | [client-based html](/2020-epc-dev/demo-auth-patterns/client/trust-ags-client.html)
 
 ## Other files
 

@@ -1,11 +1,7 @@
-// import "@esri/calcite-components/dist/calcite.js";
-// import { defineCustomElements } from '@esri/calcite-components/dist/custom-elements';
 import { UserSession } from '@esri/arcgis-rest-auth';
 import { getPortal } from '@esri/arcgis-rest-portal';
 import { createSolution } from '@esri/solution-creator';
 import { deploySolution } from '@esri/solution-deployer';
-
-// defineCustomElements();
 
 const CLIENT_ID = 'wqxf4JBvtmeyB18v';
 const SESSION_ID = 'solutionjs_demo';
@@ -58,6 +54,7 @@ async function onLogIn(step, session){
   localStorage.setItem(`${SESSION_ID}_${step}`, JSON.stringify(session.toJSON()))
 }
 
+// check if there's an existing session and respond appropriately
 function handleExistingSession(step){
   const serializedSession = localStorage.getItem(`${SESSION_ID}_${step}`);
   if(serializedSession){
@@ -86,6 +83,7 @@ document.querySelector("#user-login").onclick = async function(){
   onLogIn('user', session);
 }
 
+// sign the users out and reload the page to invalidate everything
 document.querySelector("#log-out").onclick = async function(){
   localStorage.removeItem(`${SESSION_ID}_admin`);
   localStorage.removeItem(`${SESSION_ID}_user`);
@@ -96,7 +94,7 @@ document.querySelector("#log-out").onclick = async function(){
   * UI logic
 ****************************************************/
 
-// update the progress element
+// map elements based on the stage
 const progressEls = {
   admin: document.querySelector("#admin-progress"),
   user: document.querySelector("#user-progress")
@@ -106,7 +104,7 @@ const resultEls = {
   user: document.querySelector("#user-result")
 }
 
-
+// update the progress element
 function setProgress(step, percentProgress){
   const progressEl = progressEls[step];
   const resultEl = resultEls[step];
@@ -115,6 +113,8 @@ function setProgress(step, percentProgress){
   progressEl.value = percentProgress / 100;
   progressEl.text = `${percentProgress}%`;
 }
+
+// update the result elements
 function onResult(step, resultUrl){
   const progressEl = progressEls[step];
   const resultEl = resultEls[step];
@@ -161,7 +161,7 @@ document.querySelector("#deploy").onclick = async function(){
   try {
     result = await deploySolution(templateEl.value, state.user.session, {
       progressCallback: progress => setProgress('user', progress),
-      // storageAuthentication: state.admin.session
+      storageAuthentication: state.admin.session
     });
   } catch(err){
     userMessageEl.active = true;

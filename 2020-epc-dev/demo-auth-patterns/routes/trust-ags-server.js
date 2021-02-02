@@ -18,7 +18,7 @@ const COOKIE_EXPIRATION_MS = 7200000; // 2 hours
 const AGS_REFRESH_TOKEN_EXPIRATION_SECONDS = 300; // 5 minutes
 
 const ClientByPortal = {
-  'https://partners-dev.bd.esri.com/portal': 'OMBnSvuZcnODnHpb'
+  'https://partners-dev.bd.esri.com/portal': 'G388ztzGeaEhh8j4'
 }
 
 module.exports = function(userStore){

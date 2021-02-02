@@ -35,7 +35,7 @@ function createCardForItem(item, onClick){
   const addBtn = createElementWithAttrs('calcite-button', {
     'scale': 'xs',
     'slot': 'footer-trailing',
-    'icon': 'plus'
+    'icon-start': 'plus'
   });
   addBtn.onclick = _ => onClick(item.id);
   
@@ -167,8 +167,9 @@ async function loadAGS(){
       "esri/widgets/Legend",
       "esri/widgets/Bookmarks",
       "esri/widgets/Expand",
-      "esri/widgets/Legend"
-    ], function(Map, WebMap, MapView, esriId, Portal, PortalQueryParams, Legend, Bookmarks, Expand, Legend) {
+      "esri/widgets/Legend",
+      "esri/widgets/Search"
+    ], function(Map, WebMap, MapView, esriId, Portal, PortalQueryParams, Legend, Bookmarks, Expand, Legend, Search) {
       
 
       /************************************
@@ -194,6 +195,10 @@ async function loadAGS(){
       });
       view.ui.add(bkExpand, "bottom-right");
       const legend = new Legend({view});
+      const search = new Search({
+        view
+      });
+      view.ui.add(search, 'top-right');
       const lgExpand = new Expand({
         view,
         content: legend
