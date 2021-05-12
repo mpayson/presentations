@@ -76,7 +76,7 @@
     "@types/react-router-dom": "^4.3.1",
     "calcite-react": "^0.28.1",
     "calcite-web": "github:Esri/calcite-web#v1.0.0-rc.8",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "chartjs-plugin-annotation": "^0.5.7",
     "d3": "^5.7.0",
     "del-cli": "^1.1.0",
