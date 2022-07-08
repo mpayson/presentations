@@ -80,7 +80,7 @@
     "chartjs-plugin-annotation": "^0.5.7",
     "d3": "^5.7.0",
     "del-cli": "^1.1.0",
-    "moment": "^2.23.0",
+    "moment": "^2.29.4",
     "react": "^16.7.0-alpha.2",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.7.0-alpha.2",
