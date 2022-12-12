@@ -20,7 +20,7 @@
     "@esri/arcgis-rest-request": "^2.8.1",
     "@esri/calcite-app-components": "^5.3.2",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.0",
     "helmet": "^3.22.0",
     "isomorphic-form-data": "^2.0.0",
